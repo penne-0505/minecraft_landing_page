@@ -25,6 +25,11 @@ const App = () => {
     }
   });
   const isLoggedIn = !!(user && user.id);
+  const [checkoutStatus, setCheckoutStatus] = useState(() => {
+    const url = new URL(window.location.href);
+    const status = url.searchParams.get("checkout");
+    return status === "success" || status === "cancel" ? status : null;
+  });
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
@@ -56,6 +61,9 @@ const App = () => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get("code");
     if (!code) return;
+
+    // clear checkout param to avoid stale banner after OAuth redirect
+    url.searchParams.delete("checkout");
 
     // prevent duplicate calls
     url.searchParams.delete("code");
@@ -138,6 +146,8 @@ const App = () => {
     avatar:
       "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg",
   };
+
+  const dismissCheckoutStatus = () => setCheckoutStatus(null);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -257,6 +267,64 @@ const App = () => {
       </nav>
 
       <main className="relative z-10 pt-20 md:pt-24 pb-12">
+        {checkoutStatus && (
+          <div className="container mx-auto px-4 md:px-6 mb-6">
+            <div
+              className={`rounded-xl px-4 py-3 shadow-md border flex flex-col gap-2 md:flex-row md:items-center md:justify-between ${
+                checkoutStatus === "success"
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                  : "bg-amber-50 border-amber-200 text-amber-800"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {checkoutStatus === "success" ? (
+                  <Check className="text-emerald-600" size={20} />
+                ) : (
+                  <HelpCircle className="text-amber-600" size={20} />
+                )}
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm">
+                    {checkoutStatus === "success"
+                      ? "決済が完了しました！"
+                      : "決済がキャンセルされました"}
+                  </span>
+                  <span className="text-xs md:text-sm">
+                    {checkoutStatus === "success"
+                      ? "ロール付与は数秒〜1分ほどで反映されます。Discordで付与を確認してください。"
+                      : "もう一度購入する場合は、下のプランから再開できます。"}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {checkoutStatus === "success" ? (
+                  <a
+                    href="https://discord.com/channels/@me"
+                    className="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold shadow-sm hover:bg-emerald-700 transition-colors"
+                  >
+                    Discordを開く
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => {
+                      dismissCheckoutStatus();
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="px-3 py-2 rounded-lg bg-white border text-sm font-semibold hover:bg-slate-50 transition-colors"
+                  >
+                    プランを再選択
+                  </button>
+                )}
+                <button
+                  onClick={dismissCheckoutStatus}
+                  className="px-3 py-2 rounded-lg bg-transparent border border-slate-200 text-sm font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <section className="container mx-auto px-4 md:px-6 mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
