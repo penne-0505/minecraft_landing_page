@@ -3,7 +3,7 @@ title: Membership Pages Roadmap
 status: proposed
 draft_status: n/a
 created_at: 2025-12-07
-updated_at: 2025-12-07
+updated_at: 2025-12-09
 references: []
 ---
 
@@ -43,6 +43,7 @@ references: []
 - M2 退会フロー  
   - Customer Portal からキャンセル。更新日まで利用可。  
   - Webhook でロール剥奪をスケジュールし、Bot に指示。
+  - 2025-12-09 実装メモ: Portal セッションをフロントから生成（/create-portal-session）。`customer.subscription.deleted` でロール剥奪、`cancel_at_period_end` 設定時はサブスク有効期間中はロールを維持。
 - M3 Discord 誘導 LP  
   - 一般公開。CTA=Discord 招待、ヘッダーからメンバーシップページへの導線。  
   - デザインは別担当へ依頼（デザイントークンは既存 LP を参照）。

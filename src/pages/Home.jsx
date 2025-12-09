@@ -33,6 +33,8 @@ const Home = () => {
   });
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [portalError, setPortalError] = useState(null);
   const heroImages = [
     "https://tutos-gameserver.fr/wp-content/uploads/2020/03/1585011128_75-1024x576.jpg",
     "https://images.immediate.co.uk/production/volatile/sites/3/2021/05/shader-minecraft-water-bd32d30.png",
@@ -140,6 +142,43 @@ const Home = () => {
       }
     } catch (err) {
       captureError(err, { stage: "checkout_start", priceType });
+    }
+  };
+
+  const openPortal = async () => {
+    if (!user) {
+      beginDiscordLogin();
+      return;
+    }
+    setPortalError(null);
+    setPortalLoading(true);
+    trackEvent("portal_open_start", { userId: user.id });
+    try {
+      const res = await fetch("/create-portal-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discord_user_id: user.id }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        if (res.status === 404) {
+          setPortalError("Stripeの契約が見つかりませんでした。決済完了後に数分お待ちください。");
+        } else {
+          setPortalError("ポータルの生成に失敗しました。時間をおいて再試行してください。");
+        }
+        captureError(new Error("Portal session failed"), { status: res.status, text });
+        return;
+      }
+      const data = await res.json();
+      if (data.url) {
+        trackEvent("portal_open_redirect", { userId: user.id });
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      setPortalError("ネットワークエラーが発生しました。接続を確認してください。");
+      captureError(err, { stage: "portal_open" });
+    } finally {
+      setPortalLoading(false);
     }
   };
 
@@ -519,6 +558,47 @@ const Home = () => {
                 ※ 返金ポリシーについては、規約をご確認ください。
               </span>
             </div>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 py-12 max-w-3xl">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 soft-shadow">
+            <div className="flex items-start justify-between gap-4 flex-col md:flex-row md:items-center">
+              <div>
+                <p className="text-xs font-bold text-[#5fbb4e] uppercase tracking-wide mb-2">
+                  Membership Portal (beta)
+                </p>
+                <h3 className="text-2xl font-black text-slate-800 mb-2">
+                  契約の確認・解約はこちら
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  決済履歴の確認、支払い方法の変更、解約（次回更新日まで利用可）が行えます。
+                  デザインは後日更新予定です。
+                </p>
+              </div>
+              <div className="w-full md:w-auto">
+                <button
+                  onClick={openPortal}
+                  disabled={portalLoading}
+                  className={`w-full md:w-auto px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors duration-200 ${
+                    portalLoading
+                      ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                      : "bg-[#5fbb4e] text-white hover:bg-[#4ea540] btn-push"
+                  }`}
+                >
+                  {portalLoading ? "読み込み中..." : "Stripeポータルを開く"}
+                  <ArrowRight size={16} />
+                </button>
+                <p className="text-[11px] text-slate-400 mt-2">
+                  * ログイン済みのDiscordアカウントが必要です。
+                </p>
+              </div>
+            </div>
+            {portalError && (
+              <div className="mt-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                {portalError}
+              </div>
+            )}
           </div>
         </section>
 
