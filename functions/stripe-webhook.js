@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { trackEvent, captureError } from "./telemetry";
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -41,10 +42,12 @@ export async function onRequest(context) {
     switch (event.type) {
       case "checkout.session.completed":
         await handleCheckoutCompleted(event.data.object, { guildId, roleId, botToken, stripe });
+        trackEvent("checkout_session_completed", { mode: event.data.object.mode }, env);
         break;
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
         await handleSubscriptionChanged(event.data.object, { guildId, roleId, botToken, stripe });
+        trackEvent("subscription_changed", { status: event.data.object.status }, env);
         break;
       default:
         // 未使用イベントは 200 で握りつつログ相当のレスポンス
@@ -52,6 +55,7 @@ export async function onRequest(context) {
     }
   } catch (err) {
     // Stripe への 2xx 以外は再送されるため、明示的に 500 を返す
+    captureError(err, { eventType: event?.type }, env);
     return new Response(`Webhook handler error: ${err.message}`, {
       status: 500,
     });

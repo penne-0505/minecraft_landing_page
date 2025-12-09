@@ -1,0 +1,17 @@
+// Minimal no-op telemetry hooks for Cloudflare Pages Functions.
+// GA4 Measurement Protocol or Sentry SDK can be wired later.
+// When env.DEBUG_TELEMETRY === "true", logs are printed to help verify call sites.
+
+export function trackEvent(name, properties = {}, env = {}) {
+  if (env?.DEBUG_TELEMETRY === "true") {
+    console.log("[telemetry:event]", name, properties);
+  }
+  // TODO: Wire to GA4 Measurement Protocol or other collector when enabled.
+}
+
+export function captureError(error, context = {}, env = {}) {
+  if (env?.DEBUG_TELEMETRY === "true") {
+    console.error("[telemetry:error]", error?.message || error, context);
+  }
+  // TODO: Wire to Sentry (node/edge) or alternative error sink when enabled.
+}

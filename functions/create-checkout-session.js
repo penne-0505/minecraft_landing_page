@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { trackEvent, captureError } from "./telemetry";
 
 /**
  * Create Stripe Checkout Session
@@ -56,19 +57,26 @@ export async function onRequest(context) {
 
   const mode = priceType === "one_month" ? "payment" : "subscription";
 
-  const session = await stripe.checkout.sessions.create({
-    mode,
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${APP_BASE_URL}/?checkout=success`,
-    cancel_url: `${APP_BASE_URL}/?checkout=cancel`,
-    metadata: {
-      discord_user_id,
-      price_type: priceType,
-    },
-  });
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode,
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${APP_BASE_URL}/?checkout=success`,
+      cancel_url: `${APP_BASE_URL}/?checkout=cancel`,
+      metadata: {
+        discord_user_id,
+        price_type: priceType,
+      },
+    });
 
-  return new Response(JSON.stringify({ url: session.url }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+    trackEvent("checkout_session_created", { priceType, mode }, env);
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    captureError(err, { stage: "checkout_session_create", priceType }, env);
+    return new Response("Stripe error", { status: 500 });
+  }
 }

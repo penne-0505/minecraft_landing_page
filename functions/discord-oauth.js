@@ -2,6 +2,7 @@
  * Exchange Discord OAuth code server-side and (optionally) add user to guild.
  * Expects POST JSON: { code }
  */
+import { trackEvent, captureError } from "./telemetry";
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -55,6 +56,7 @@ export async function onRequest(context) {
 
   if (!tokenRes.ok) {
     const text = await tokenRes.text();
+    captureError(new Error("Token exchange failed"), { status: tokenRes.status, text }, env);
     return new Response(`Token exchange failed: ${text}`, { status: 400 });
   }
 
@@ -69,6 +71,7 @@ export async function onRequest(context) {
 
   if (!userRes.ok) {
     const text = await userRes.text();
+    captureError(new Error("User fetch failed"), { status: userRes.status, text }, env);
     return new Response(`User fetch failed: ${text}`, { status: 400 });
   }
 
@@ -89,8 +92,11 @@ export async function onRequest(context) {
   if (!joinRes.ok && joinRes.status !== 204 && joinRes.status !== 201) {
     const text = await joinRes.text();
     // 409/400 は既に参加済みなどのケースもあるため警告扱いで返さない
+    captureError(new Error("Guild join failed"), { status: joinRes.status, text }, env);
     console.warn("Guild join failed", joinRes.status, text);
   }
+
+  trackEvent("discord_oauth_success", { userId: user.id }, env);
 
   return new Response(
     JSON.stringify({

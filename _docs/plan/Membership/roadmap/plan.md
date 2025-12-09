@@ -50,6 +50,12 @@ references: []
   - GA4/Sentry の計測フックを追加するためのイベント/エラー境界を予め配置。  
   - 導入タイミング決定後に環境変数と送信先設定を行う。
 
+### M4 Instrumentation Notes (WIP)
+- Front (Pages): `VITE_GA4_MEASUREMENT_ID`, `VITE_SENTRY_DSN`, `VITE_APP_BASE_URL`, `VITE_DISCORD_CLIENT_ID`, `VITE_DISCORD_REDIRECT_URI`
+- Functions (Pages Functions): `SENTRY_DSN` (server-side 導入予定), `DEBUG_TELEMETRY` (true で no-op ログ出力) を想定
+- 実装方針: 現状は no-op フックのみ。GA4 Measurement Protocol / Sentry SDK を後日接続し、`trackEvent` / `captureError` 呼び出し箇所をそのまま活用する。
+- イベント候補: `checkout_session_created`, `checkout_session_completed`, `subscription_changed`, Discord OAuth 成功/失敗。
+
 ## Risks & Mitigations
 - Stripe/Discord 連携失敗: Webhook イベントの冪等処理と再試行キューを Bot 側で実装。失敗時はエラーログを Sentry（導入後）へ送信。
 - レートリミット: Bot 側でキューとバックオフを実装し、Functions では極力ロジックを持たない。

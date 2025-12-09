@@ -229,19 +229,6 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
   - **Description**: Discord 参加を主CTAとする一般公開LPを構築し、既存メンバーシップページへの導線も付与する。
   - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
 
-- **Title**: [Chore] GA4/Sentry 導入準備フック
-  - **ID**: Membership-Chore-4
-  - **Priority**: P3
-  - **Size**: S
-  - **Area**: Membership
-  - **Dependencies**: [Membership-Feat-1, Membership-Feat-2, Membership-Feat-3]
-  - **Goal**: GA4/Sentry を後日オンにできるよう、イベント発火ポイントとエラー境界のフックが配置されていること。
-  - **Steps**:
-    1. [ ] フロントと Functions に no-op イベント送信フック/エラー境界を配置
-    2. [ ] 環境変数キーと送信先設定の TODO コメントを残し、導入手順を Plan M4 に追記
-  - **Description**: 後日導入予定の計測基盤向けに、コード上のフックを先行で用意する。
-  - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
-
 ## Ready
 
 ---
