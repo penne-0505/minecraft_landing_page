@@ -242,20 +242,6 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
   - **Description**: 後日導入予定の計測基盤向けに、コード上のフックを先行で用意する。
   - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
 
-- **Title**: [Doc] Analytics/Sentry フック使い方ドキュメント整備
-  - **ID**: Membership-Doc-5
-  - **Priority**: P2
-  - **Size**: S
-  - **Area**: Membership
-  - **Dependencies**: []
-  - **Goal**: `_docs/draft/analytics_usage.md` を整備し、GA4/Sentry の有効化手順が1ファイルで参照できる状態にする。
-  - **Steps**:
-    1. [ ] Draftの内容を最新コードに合わせて確認・更新
-    2. [ ] 必要なら環境変数一覧を追記し、Pages設定手順を明記
-    3. [ ] 必要に応じて guide への昇格可否を判断（今回のスコープでは draft のままで可）
-  - **Description**: no-op フックの運用手順をドキュメント化し、後日有効化時の手戻りを防ぐ。
-  - **Plan**: `_docs/draft/analytics_usage.md`
-
 ## Ready
 
 ---
