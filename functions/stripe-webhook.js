@@ -69,7 +69,8 @@ function getStripe(env) {
   if (!secretKey) {
     throw new Error("STRIPE_SECRET_KEY not configured");
   }
-  return new Stripe(secretKey, { apiVersion: "2024-11-20" });
+  // Use account default API version; avoid pinning to unavailable future versions.
+  return new Stripe(secretKey);
 }
 
 async function handleCheckoutCompleted(session, ctx) {
