@@ -1,0 +1,64 @@
+import Stripe from "stripe";
+import { trackEvent, captureError } from "./telemetry";
+
+/**
+ * Create Stripe Billing Portal session for the logged-in Discord user.
+ * POST JSON: { discord_user_id: string }
+ */
+export async function onRequest(context) {
+  const { request, env } = context;
+
+  if (request.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  const { STRIPE_SECRET_KEY, APP_BASE_URL } = env;
+  if (!STRIPE_SECRET_KEY || !APP_BASE_URL) {
+    return new Response("Missing Stripe env", { status: 500 });
+  }
+
+  let discordUserId;
+  try {
+    const body = await request.json();
+    discordUserId = body.discord_user_id;
+  } catch (_) {
+    return new Response("Invalid JSON", { status: 400 });
+  }
+
+  if (!discordUserId) {
+    return new Response("Missing discord_user_id", { status: 400 });
+  }
+
+  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-11-20" });
+
+  try {
+    const customer = await findCustomerByDiscordId(stripe, discordUserId);
+    if (!customer) {
+      return new Response("Customer not found", { status: 404 });
+    }
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customer.id,
+      return_url: `${APP_BASE_URL}/?portal=return`,
+    });
+
+    trackEvent("portal_session_created", { customerId: customer.id }, env);
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    captureError(err, { stage: "portal_session_create" }, env);
+    return new Response("Stripe portal error", { status: 500 });
+  }
+}
+
+async function findCustomerByDiscordId(stripe, discordUserId) {
+  const query = `metadata['discord_user_id']:'${discordUserId}'`;
+  const result = await stripe.customers.search({ query, limit: 1 });
+  if (result?.data?.length) {
+    return result.data[0];
+  }
+  return null;
+}

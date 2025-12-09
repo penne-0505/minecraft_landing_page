@@ -1,10 +1,28 @@
 :root {
   color-scheme: light;
+  /* Design tokens (from guide/design/design_tokens.md) */
+  --color-bg: #f0f9ff;
+  --color-surface: #ffffff;
+  --color-text: #1e293b;
+  --color-accent: #5fbb4e;
+  --color-accent-strong: #4a9a3d;
+  --color-cta: #5865f2;
+  --color-cta-shadow: #4752c4;
+  --color-border: #e2e8f0;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(50, 60, 90, 0.05);
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
 }
 
 body {
   margin: 0;
-  background: #f0f9ff;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: "M PLUS Rounded 1c", "Outfit", system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
 }

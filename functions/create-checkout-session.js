@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { trackEvent, captureError } from "./telemetry";
 
 /**
  * Create Stripe Checkout Session
@@ -56,19 +57,57 @@ export async function onRequest(context) {
 
   const mode = priceType === "one_month" ? "payment" : "subscription";
 
-  const session = await stripe.checkout.sessions.create({
-    mode,
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${APP_BASE_URL}/?checkout=success`,
-    cancel_url: `${APP_BASE_URL}/?checkout=cancel`,
-    metadata: {
-      discord_user_id,
-      price_type: priceType,
-    },
-  });
+  try {
+    const customer = await findOrCreateCustomer(stripe, discord_user_id);
 
-  return new Response(JSON.stringify({ url: session.url }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
+    const session = await stripe.checkout.sessions.create({
+      mode,
+      customer: customer.id,
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${APP_BASE_URL}/?checkout=success`,
+      cancel_url: `${APP_BASE_URL}/?checkout=cancel`,
+      metadata: {
+        discord_user_id,
+        price_type: priceType,
+      },
+      subscription_data:
+        mode === "subscription"
+          ? {
+              metadata: { discord_user_id, price_type: priceType },
+            }
+          : undefined,
+      payment_intent_data:
+        mode === "payment"
+          ? { metadata: { discord_user_id, price_type: priceType } }
+          : undefined,
+      client_reference_id: discord_user_id,
+    });
+
+    trackEvent(
+      "checkout_session_created",
+      { priceType, mode, customerId: customer.id },
+      env
+    );
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    captureError(err, { stage: "checkout_session_create", priceType }, env);
+    return new Response("Stripe error", { status: 500 });
+  }
+}
+
+async function findOrCreateCustomer(stripe, discordUserId) {
+  // Stripe Search API is available for Customers. We rely on metadata to find the same user.
+  const query = `metadata['discord_user_id']:'${discordUserId}'`;
+  const existing = await stripe.customers.search({ query, limit: 1 });
+  if (existing?.data?.length) {
+    return existing.data[0];
+  }
+
+  return stripe.customers.create({
+    metadata: { discord_user_id: discordUserId },
   });
 }

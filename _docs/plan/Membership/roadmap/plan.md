@@ -3,7 +3,7 @@ title: Membership Pages Roadmap
 status: proposed
 draft_status: n/a
 created_at: 2025-12-07
-updated_at: 2025-12-07
+updated_at: 2025-12-09
 references: []
 ---
 
@@ -43,12 +43,19 @@ references: []
 - M2 退会フロー  
   - Customer Portal からキャンセル。更新日まで利用可。  
   - Webhook でロール剥奪をスケジュールし、Bot に指示。
+  - 2025-12-09 実装メモ: Portal セッションをフロントから生成（/create-portal-session）。`customer.subscription.deleted` でロール剥奪、`cancel_at_period_end` 設定時はサブスク有効期間中はロールを維持。
 - M3 Discord 誘導 LP  
   - 一般公開。CTA=Discord 招待、ヘッダーからメンバーシップページへの導線。  
   - デザインは別担当へ依頼（デザイントークンは既存 LP を参照）。
 - M4 計測・監視（後日導入）  
   - GA4/Sentry の計測フックを追加するためのイベント/エラー境界を予め配置。  
   - 導入タイミング決定後に環境変数と送信先設定を行う。
+
+### M4 Instrumentation Notes (WIP)
+- Front (Pages): `VITE_GA4_MEASUREMENT_ID`, `VITE_SENTRY_DSN`, `VITE_APP_BASE_URL`, `VITE_DISCORD_CLIENT_ID`, `VITE_DISCORD_REDIRECT_URI`
+- Functions (Pages Functions): `SENTRY_DSN` (server-side 導入予定), `DEBUG_TELEMETRY` (true で no-op ログ出力) を想定
+- 実装方針: 現状は no-op フックのみ。GA4 Measurement Protocol / Sentry SDK を後日接続し、`trackEvent` / `captureError` 呼び出し箇所をそのまま活用する。
+- イベント候補: `checkout_session_created`, `checkout_session_completed`, `subscription_changed`, Discord OAuth 成功/失敗。
 
 ## Risks & Mitigations
 - Stripe/Discord 連携失敗: Webhook イベントの冪等処理と再試行キューを Bot 側で実装。失敗時はエラーログを Sentry（導入後）へ送信。
