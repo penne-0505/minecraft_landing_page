@@ -29,7 +29,8 @@ export async function onRequest(context) {
     return new Response("Missing discord_user_id", { status: 400 });
   }
 
-  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-11-20" });
+  // Use account default API version; avoid pinning to unavailable future versions.
+  const stripe = new Stripe(STRIPE_SECRET_KEY);
 
   try {
     const customer = await findCustomerByDiscordId(stripe, discordUserId);

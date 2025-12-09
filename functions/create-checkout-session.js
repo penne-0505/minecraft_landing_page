@@ -53,7 +53,8 @@ export async function onRequest(context) {
     return new Response("Invalid priceType", { status: 400 });
   }
 
-  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-11-20" });
+  // Use account default API version; avoid pinning to unavailable future versions.
+  const stripe = new Stripe(STRIPE_SECRET_KEY);
 
   const mode = priceType === "one_month" ? "payment" : "subscription";
 
