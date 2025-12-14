@@ -186,18 +186,19 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 
 ## Backlog
 
-- **Title**: [Content] Helpページ文言整備
-  - **ID**: Content-Feat-9
-  - **Priority**: P3
-  - **Size**: S
-  - **Area**: Content
-  - **Dependencies**: []
-  - **Goal**: `/help` ページにFAQリンクや問い合わせ導線など最低限の文言を追加し、プレースホルダ状態を解消する。
-  - **Steps**:
-    1. [ ] 文言ドラフトを作成し、リンク先（FAQ/問い合わせフォーム）が未整備の場合は暫定表記を記載
-    2. [ ] `/help` ページに反映し、/contract からの導線表示を確認
-  - **Description**: 仮ページのままの `/help` を最低限有用なコンテンツにする。
-  - **Plan**: None
+- **Title**: [Chore] Discord誘導URLを本番値に差し替え
+  - **ID**: Membership-Chore-13
+  - **Priority**: P2
+  - **Size**: XS
+- **Area**: Membership
+- **Dependencies**: []
+- **Goal**: 決済完了後に表示されるサクセスバナーの Discord 誘導リンクが正式な本番チャンネル URL に更新されている。
+- **Steps**:
+  1. [ ] 正式なDiscordチャンネルURLを運営から取得
+  2. [ ] `src/pages/Home.jsx` のサクセスバナー内リンクを差し替え、必要なら TODO を完了扱いにする
+  3. [ ] 動作確認後、タスクを Done に移す
+- **Description**: 暫定URL `https://discord.com/channels/746587719827980359/947145885798776902` を、本番の誘導先に置き換える。
+- **Plan**: None
 
 - **Title**: [Legal] 利用規約の策定と反映
   - **ID**: Legal-Feat-10

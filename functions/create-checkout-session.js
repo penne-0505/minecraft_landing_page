@@ -43,8 +43,7 @@ export async function onRequest(context) {
 		consent_display,
 		consent_roles,
 		consent_terms,
-	} =
-		body || {};
+	} = body || {};
 	if (!priceType || !discord_user_id) {
 		return new Response("Missing priceType or discord_user_id", {
 			status: 400,

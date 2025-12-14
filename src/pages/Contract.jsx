@@ -1,10 +1,74 @@
 import React, { useState, useEffect } from "react";
-import { Check, Shield, ArrowRight, AlertCircle, Info } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Check, 
+  ShieldCheck, 
+  Users, 
+  AlertCircle, 
+  Loader2, 
+  ArrowRight,
+} from "lucide-react";
 import { trackEvent, captureError } from "../analytics";
 import { PLANS } from "../constants/plans";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
+import InteractiveClover from "../components/ui/InteractiveClover";
 
-const Contract = () => {
+const CheckboxCard = ({ 
+  checked, 
+  onChange, 
+  icon, 
+  title, 
+  description,
+  tag 
+}) => (
+  <div 
+    onClick={onChange}
+    className={`
+      group relative flex items-center gap-4 p-4 pr-6 rounded-2xl border transition-all duration-200 cursor-pointer select-none
+      ${checked 
+        ? 'bg-white border-slate-300 shadow-[0_4px_0_#e2e8f0] translate-y-[-2px]' 
+        : 'bg-slate-50 border-slate-200 opacity-80 hover:opacity-100'
+      }
+    `}
+  >
+    <div className={`
+      w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-300
+      ${checked ? 'bg-[#5865F2] text-white' : 'bg-slate-200 text-slate-400'}
+    `}>
+      {checked ? icon : <div className="grayscale opacity-50">{icon}</div>}
+    </div>
+
+    <div className="flex-1">
+      <div className="flex items-center gap-2 mb-1">
+        <h4 className={`font-display font-bold text-base ${checked ? 'text-slate-800' : 'text-slate-500'}`}>
+          {title}
+        </h4>
+        {tag && (
+          <span className="text-[10px] font-black bg-[#5fbb4e]/10 text-[#5fbb4e] px-2 py-0.5 rounded-full uppercase tracking-wider">
+            {tag}
+          </span>
+        )}
+      </div>
+      <p className="font-body text-xs md:text-sm text-slate-500 leading-tight">
+        {description}
+      </p>
+    </div>
+
+    <div className={`
+      w-12 h-7 rounded-full p-1 transition-colors duration-300 flex items-center
+      ${checked ? 'bg-[#5fbb4e]' : 'bg-slate-300'}
+    `}>
+      <motion.div 
+        layout
+        className="w-5 h-5 bg-white rounded-full shadow-sm"
+      />
+    </div>
+  </div>
+);
+
+export default function Contract() {
   const [searchParams] = useSearchParams();
   const planParam = searchParams.get("plan");
 
@@ -18,29 +82,28 @@ const Contract = () => {
     }
   });
 
-  const [consentDisplay, setConsentDisplay] = useState(true);
-  const [consentRoles, setConsentRoles] = useState(true);
-  const [consentTerms, setConsentTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [agreements, setAgreements] = useState({
+    discordRole: true,
+    publicListing: true,
+    terms: false,
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [oauthRedirecting, setOauthRedirecting] = useState(false);
 
-  const appBaseUrl =
-    import.meta.env.VITE_APP_BASE_URL || window.location.origin;
-  const redirectUriClient =
-    import.meta.env.VITE_DISCORD_REDIRECT_URI || `${appBaseUrl}/auth/callback`;
+  const appBaseUrl = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
+  const redirectUriClient = import.meta.env.VITE_DISCORD_REDIRECT_URI || `${appBaseUrl}/auth/callback`;
 
-  // OAuth callback handling
+  // --- Logic from original Contract.jsx ---
   useEffect(() => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get("code");
     if (!code) return;
 
-    // prevent duplicate calls
     url.searchParams.delete("code");
     url.searchParams.delete("state");
-    const cleanUrl = url.toString();
-    window.history.replaceState({}, "", cleanUrl);
+    window.history.replaceState({}, "", url.toString());
 
     (async () => {
       try {
@@ -50,13 +113,9 @@ const Contract = () => {
           body: JSON.stringify({ code }),
         });
         if (!res.ok) {
-          const text = await res.text();
-          captureError(new Error("OAuth exchange failed"), { text, status: res.status });
           if (res.status === 401) {
             setError("認証に失敗しました。メンバーシップページへ戻ります。");
-            setTimeout(() => {
-              window.location.href = "/membership";
-            }, 1800);
+            setTimeout(() => { window.location.href = "/membership"; }, 1800);
           } else {
             setError("認証に失敗しました。もう一度お試しください。");
           }
@@ -97,13 +156,11 @@ const Contract = () => {
     window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
   };
 
-  // Login check
   useEffect(() => {
     if (!planParam) {
       window.location.replace("/membership");
       return;
     }
-
     const url = new URL(window.location.href);
     if (url.searchParams.get("code")) return;
 
@@ -114,12 +171,16 @@ const Contract = () => {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, [user, planParam]);
 
-  const handleCheckout = async () => {
-    if (!user || !planParam || !consentTerms) return;
+  const toggleAgreement = (key) => {
+    setAgreements((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handlePayment = async () => {
+    if (!user || !planParam || !agreements.terms) return;
     
-    setLoading(true);
+    setIsLoading(true);
     trackEvent("checkout_start", { priceType: planParam });
 
     try {
@@ -129,9 +190,9 @@ const Contract = () => {
         body: JSON.stringify({
           priceType: planParam,
           discord_user_id: user.id,
-          consent_display: consentDisplay,
-          consent_roles: consentRoles,
-          consent_terms: consentTerms,
+          consent_display: agreements.publicListing,
+          consent_roles: agreements.discordRole,
+          consent_terms: agreements.terms,
         }),
       });
 
@@ -139,7 +200,7 @@ const Contract = () => {
         const text = await res.text();
         captureError(new Error("Checkout create failed"), { priceType: planParam, text });
         setError("決済セッションの作成に失敗しました。");
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
 
@@ -150,12 +211,24 @@ const Contract = () => {
     } catch (err) {
       captureError(err, { stage: "checkout_start_contract", priceType: planParam });
       setError("ネットワークエラーが発生しました。");
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const planInfo = PLANS[planParam] || null;
-  const getPlanName = (p) => PLANS[p]?.label ? `${PLANS[p].label} Plan` : "Unknown Plan";
+  // Map PLANS to UI format
+  const planInfo = PLANS[planParam] || {};
+  const planDetails = {
+    name: planInfo.label ? `${planInfo.label} Plan` : "Unknown Plan",
+    price: `¥${planInfo.price?.toLocaleString()}`,
+    interval: planInfo.unit ? `/${planInfo.unit}` : "",
+    features: ["Priority Login", "Supporter Chat", "Cosmetic items"], // Fallback if not in PLANS
+    // Styling mapping
+    color: planParam === "one_month" ? "from-lime-200 to-lime-100" : (planParam === "sub_yearly" ? "from-teal-200 to-teal-100" : "from-[#a7f3d0] to-[#d1fae5]"),
+    borderColor: planParam === "one_month" ? "border-lime-300" : (planParam === "sub_yearly" ? "border-teal-300" : "border-[#6ee7b7]"),
+    badgeColor: planParam === "one_month" ? "text-lime-700 bg-lime-100" : (planParam === "sub_yearly" ? "text-teal-700 bg-teal-100" : "text-emerald-700 bg-emerald-100"),
+  };
+
+  const isPayable = agreements.terms && !isLoading;
 
   if (!user) {
     return (
@@ -168,7 +241,7 @@ const Contract = () => {
             </>
           ) : (
             <>
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5fbb4e] mx-auto mb-4"></div>
+              <Loader2 className="animate-spin w-12 h-12 text-[#5fbb4e] mx-auto mb-4" />
               <p className="text-slate-600 font-bold">
                 {oauthRedirecting ? "Discord 認証へ移動しています..." : "ページを準備しています..."}
               </p>
@@ -179,198 +252,286 @@ const Contract = () => {
     );
   }
 
+  // --- Render (New UI) ---
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { type: "spring", stiffness: 50, damping: 15 }
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans">
+    <div className="min-h-screen bg-[#f8fafc] font-sans selection:bg-[#5fbb4e]/30 text-slate-800 flex flex-col">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700;900&display=swap');
-        body { font-family: 'M PLUS Rounded 1c', sans-serif; }
-        h1, h2, h3, .brand-font { font-family: 'Outfit', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Outfit:wght@500;700;900&display=swap');
+        .font-display { font-family: 'Outfit', sans-serif; }
+        .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }
+        .btn-push:active { transform: translateY(4px); box-shadow: none !important; }
       `}</style>
-      <main className="container mx-auto px-4 md:px-6 py-14 max-w-3xl">
-        <h1 className="text-3xl md:text-4xl font-black text-slate-800 mb-6 text-center">
-          支援手続きの確認
-        </h1>
-        <p className="text-center text-sm text-slate-600 mb-10">
-          支援者表示への同意と、Discord ロール付与の可否を選択したうえで、Stripe 決済へ進みます。
-        </p>
 
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2">
-            <AlertCircle size={20} />
-            <span className="font-bold text-sm">{error}</span>
-          </div>
-        )}
+      <Header 
+        isLoggedIn={true} 
+        user={user} 
+        onLogin={() => {}} 
+        onLogout={() => { localStorage.removeItem("discord_user"); setUser(null); }} 
+        onScrollTop={() => window.scrollTo(0, 0)} 
+      />
 
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 space-y-6">
-          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Selected Plan
-                </div>
-                <div className="text-xl font-black text-slate-800 brand-font">
-                  {getPlanName(planParam)}
-                </div>
-                {planInfo && (
-                  <div className="text-sm text-slate-600 mt-1">
-                    ￥{planInfo.price.toLocaleString()} / {planInfo.unit}
+      <main className="flex-grow pt-24 pb-12 px-4 md:px-6">
+        <div className="max-w-5xl mx-auto">
+          
+          {/* Page Title */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 md:mb-12 text-center md:text-left"
+          >
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+              Confirm your support
+            </h1>
+            <p className="font-body text-slate-500 font-bold">
+              Final step before payment. No money is charged yet.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
+          >
+            
+            {/* Left Col: Plan Card */}
+            <motion.div variants={itemVariants} className="lg:col-span-5 order-2 lg:order-1">
+              <div className="sticky top-28">
+                <div className={`relative overflow-hidden rounded-[24px] bg-white border-2 ${planDetails.borderColor} shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)]`}>
+                  <div className={`h-32 bg-gradient-to-br ${planDetails.color} p-6 flex flex-col justify-between relative`}>
+                    <div className="absolute -left-3 bottom-0 w-6 h-6 bg-[#f8fafc] rounded-full" />
+                    <div className="absolute -right-3 bottom-0 w-6 h-6 bg-[#f8fafc] rounded-full" />
+                    
+                    <span className={`self-start px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${planDetails.badgeColor}`}>
+                      Selected Plan
+                    </span>
+                    <div className="text-right">
+                       <InteractiveClover />
+                    </div>
                   </div>
-                )}
+
+                  <div className="p-8 pt-6 bg-white relative">
+                    <div className="absolute top-0 left-4 right-4 border-t-2 border-dashed border-slate-200"></div>
+
+                    <h2 className="font-display text-2xl font-bold text-slate-800 mb-1">
+                      {planDetails.name}
+                    </h2>
+                    <div className="flex items-baseline mb-6">
+                      <span className="font-display text-4xl font-black text-slate-900 tracking-tight">
+                        {planDetails.price}
+                      </span>
+                      <span className="font-body text-slate-400 font-bold ml-1 text-sm">
+                        {planDetails.interval}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 mb-8">
+                      {planDetails.features.map((feat, i) => (
+                        <div key={i} className="flex items-center gap-3 text-slate-600 font-body font-bold text-sm">
+                          <div className="w-5 h-5 rounded-full bg-[#ecfdf5] flex items-center justify-center shrink-0">
+                            <Check size={12} className="text-[#059669]" strokeWidth={3} />
+                          </div>
+                          {feat}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* User Context */}
+                    <div className="bg-slate-50 rounded-xl p-4 flex items-center gap-3 border border-slate-100">
+                      <img 
+                        src={user.avatar || "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg"} 
+                        alt={user.name} 
+                        className="w-10 h-10 rounded-full bg-white shadow-sm"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">Account</span>
+                        <span className="font-display font-bold text-slate-700">{user.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <img
-                  src={
-                    user.avatar ||
-                    "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg"
-                  }
-                  className="w-10 h-10 rounded-full shadow-sm"
-                  alt=""
-                />
-                <div className="leading-tight">
-                  <div className="text-sm font-bold text-slate-700">
-                    {user.name}
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    #{user.discriminator} としてログイン中
+            </motion.div>
+
+            {/* Right Col: Agreements & Action */}
+            <div className="lg:col-span-7 order-1 lg:order-2 space-y-8">
+              
+              {/* Agreements Section */}
+              <motion.div variants={itemVariants} className="space-y-4">
+                <h3 className="font-display text-xl font-bold text-slate-800 flex items-center gap-2">
+                  <ShieldCheck className="text-[#5fbb4e]" />
+                  Permissions & Terms
+                </h3>
+                
+                <div className="flex flex-col gap-4">
+                  <CheckboxCard 
+                    checked={agreements.discordRole}
+                    onChange={() => toggleAgreement('discordRole')}
+                    icon={<Users size={20} />}
+                    title="Grant Discord Role"
+                    description="Automatically give you the Supporter role on our Discord server."
+                    tag="Recommended"
+                  />
+
+                  <CheckboxCard 
+                    checked={agreements.publicListing}
+                    onChange={() => toggleAgreement('publicListing')}
+                    icon={<InteractiveClover />}
+                    title="Show on Leaderboard"
+                    description={
+                      agreements.publicListing 
+                      ? "Your name will be listed on the public supporters page."
+                      : "You will be listed as 'Anonymous Supporter'."
+                    }
+                  />
+
+                  <div className="pt-2">
+                    <label 
+                      className={`
+                        group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer select-none
+                        ${agreements.terms 
+                          ? 'border-[#5fbb4e] bg-[#ecfdf5]/30' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                        }
+                      `}
+                    >
+                      <div className="relative mt-0.5">
+                        <input 
+                          type="checkbox" 
+                          className="peer sr-only" 
+                          checked={agreements.terms}
+                          onChange={() => toggleAgreement('terms')}
+                        />
+                        <div className={`
+                          w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200
+                          ${agreements.terms 
+                            ? 'bg-[#5fbb4e] border-[#5fbb4e]' 
+                            : 'bg-white border-slate-300 group-hover:border-slate-400'
+                          }
+                        `}>
+                          <Check size={16} className="text-white" strokeWidth={4} />
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-display font-bold text-slate-800 text-lg">
+                            Accept Terms of Service
+                          </span>
+                          <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                            Required
+                          </span>
+                        </div>
+                        <div className="font-body text-slate-500 text-sm leading-relaxed">
+                          I agree to the <a href="/legal/terms" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>Terms of Service</a> and <a href="/legal/privacy" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>. I understand this is a digital goods purchase.
+                        </div>
+                      </div>
+                    </label>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Actions Section */}
+              <motion.div variants={itemVariants} className="pt-4 border-t border-slate-200">
+                <div className="flex flex-col-reverse md:flex-row gap-4 md:items-center justify-between">
+                  <button 
+                    onClick={() => window.location.href = "/membership"}
+                    className="font-body font-bold text-slate-400 hover:text-slate-600 px-4 py-3 transition-colors text-sm"
+                  >
+                    Cancel & Return
+                  </button>
+
+                  <div className="flex flex-col gap-2 w-full md:w-auto">
+                    <button
+                      onClick={handlePayment}
+                      disabled={!isPayable}
+                      className={`
+                        btn-push relative w-full md:w-64 h-14 rounded-2xl font-display font-bold text-lg flex items-center justify-center gap-3 transition-all
+                        ${isPayable 
+                          ? 'bg-[#5fbb4e] text-white shadow-[0_4px_0_#469e38] hover:bg-[#4ea540] translate-y-0' 
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                        }
+                      `}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <>
+                          <span>Pay with Stripe</span>
+                          <ArrowRight size={20} strokeWidth={3} />
+                        </>
+                      )}
+                    </button>
+                    {!agreements.terms && (
+                      <p className="text-center md:text-right text-xs font-bold text-orange-400 mt-2">
+                        * Please accept the terms to proceed
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="mt-8 text-center">
+                   <a href="/help" className="text-xs font-bold text-slate-400 hover:text-[#5865F2] transition-colors inline-flex items-center gap-1">
+                     <AlertCircle size={12} />
+                     Having trouble? Visit Help Center
+                   </a>
+                </div>
+              </motion.div>
+
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <ToggleRow
-              title="利用規約に同意する"
-              desc="Stripe 決済の前に利用規約へ同意してください。"
-              checked={consentTerms}
-              onChange={() => setConsentTerms(!consentTerms)}
-              required
-              linkLabel="利用規約を開く"
-              linkHref="/legal/terms"
-            />
-            <ToggleRow
-              title="支援者として名前を表示する（任意）"
-              desc="支援者一覧やサーバー内でのクレジット表記に Discord 名を利用します。オフにすると匿名表示になります。"
-              checked={consentDisplay}
-              onChange={() => setConsentDisplay(!consentDisplay)}
-            />
-            <ToggleRow
-              title="支援ロールを自動付与する（任意）"
-              desc="決済完了後、自動的にサポーターロールを付与し、特典チャンネルへアクセス可能にします。"
-              checked={consentRoles}
-              onChange={() => setConsentRoles(!consentRoles)}
-            />
-          </div>
-
-          {!consentDisplay && (
-            <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-              <Info size={14} className="text-slate-400" />
-              <span>支援者一覧では「匿名」として表示されます。</span>
-            </div>
-          )}
-
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-600">
-            <div className="font-bold text-slate-800 mb-2">次のステップ</div>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>上記の同意内容を確認する（利用規約は必須）</li>
-              <li>Stripe へ遷移して決済情報を入力する</li>
-              <li>決済完了後、自動的に Discord ロールが付与されます</li>
-            </ol>
-            <div className="text-xs text-slate-500 mt-3 flex flex-wrap gap-3">
-              <a href="/legal/terms" className="font-bold text-[#5865F2] hover:underline">
-                利用規約
-              </a>
-              <a href="/legal/privacy" className="font-bold text-[#5865F2] hover:underline">
-                プライバシーポリシー
-              </a>
-              <a href="/legal/refund" className="font-bold text-[#5865F2] hover:underline">
-                返金ポリシー
-              </a>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-3">
-            <button
-              onClick={handleCheckout}
-              disabled={loading || !planParam || !consentTerms}
-              className={`flex-1 py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 transition-colors duration-200 ${
-                consentTerms && !loading && planParam
-                  ? "bg-[#5fbb4e] text-white hover:bg-[#4a9a3d] shadow-[0_4px_0_#469e38] active:shadow-none active:translate-y-[4px]"
-                  : "bg-slate-200 text-slate-500 cursor-not-allowed"
-              }`}
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  <Shield size={20} />
-                  Stripe で決済する
-                </>
-              )}
-            </button>
-            <a
-              href="/membership"
-              className="md:w-48 w-full text-center py-4 rounded-2xl font-bold text-sm border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              戻る・キャンセル
-            </a>
-          </div>
-
-          <div className="text-center">
-            <a
-              href="/help"
-              className="text-sm font-bold text-[#5865F2] hover:underline"
-            >
-              ヘルプ・FAQを見る
-            </a>
-          </div>
+          </motion.div>
         </div>
       </main>
+
+      <Footer onScrollTop={() => window.scrollTo(0, 0)} />
+
+      {/* Error Modal Overlay */}
+      <AnimatePresence>
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.9, opacity: 0 }}
+               className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
+             >
+               <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <AlertCircle size={32} />
+               </div>
+               <h3 className="font-display font-bold text-xl text-slate-800 mb-2">Error</h3>
+               <p className="font-body text-slate-600 mb-6">{error}</p>
+               <button 
+                 onClick={() => setError(null)}
+                 className="w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors"
+               >
+                 Dismiss
+               </button>
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
-};
-
-const ToggleRow = ({ title, desc, checked, onChange, required = false, linkLabel, linkHref }) => (
-  <label className="flex items-start gap-3 cursor-pointer group">
-    <div
-      className={`w-6 h-6 mt-0.5 rounded-lg border flex items-center justify-center transition-colors ${
-        checked ? "bg-[#5fbb4e] border-[#4a9a3d]" : "bg-white border-slate-300 group-hover:border-[#5fbb4e]"
-      }`}
-      role="checkbox"
-      aria-checked={checked}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onChange();
-        }
-      }}
-    >
-      {checked && <Check size={16} className="text-white" />}
-    </div>
-    <div className="flex-1">
-      <div className="flex items-center gap-2">
-        <div className="font-bold text-slate-800 group-hover:text-[#5fbb4e] transition-colors">{title}</div>
-        <span
-          className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-            required ? "bg-red-100 text-red-600" : "bg-slate-100 text-slate-500"
-          }`}
-        >
-          {required ? "必須" : "任意"}
-        </span>
-      </div>
-      <div className="text-sm text-slate-600 leading-relaxed">{desc}</div>
-      {linkLabel && linkHref && (
-        <a
-          href={linkHref}
-          className="text-xs font-bold text-[#5865F2] hover:underline inline-flex items-center gap-1 mt-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {linkLabel} <ArrowRight size={14} />
-        </a>
-      )}
-    </div>
-  </label>
-);
-
-export default Contract;
+}
