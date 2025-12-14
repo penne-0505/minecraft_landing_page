@@ -20,7 +20,7 @@ const tabs = [
   {
     key: "tokusho",
     label: "特商法表記",
-    file: "/legal",
+    file: "/legal/tokusho",
     summary:
       "事業者名、所在地、連絡先、販売価格、支払方法、返品・キャンセル条件などをここに記載します。",
   },
