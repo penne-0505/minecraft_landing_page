@@ -1,7 +1,7 @@
 # Project Task Management Rules
 
 ## 0. System Metadata
-- **Current Max ID**: `Next ID No: 7` (※タスク追加時にインクリメント必須)
+- **Current Max ID**: `Next ID No: 11` (※タスク追加時にインクリメント必須)
 - **ID Source of Truth**: このファイルの `Next ID No` 行が、全プロジェクトにおける唯一のID発番元である。
 
 ## 1. Task Lifecycle (State Machine)
@@ -185,6 +185,33 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 ---
 
 ## Backlog
+
+- **Title**: [Content] Helpページ文言整備
+  - **ID**: Content-Feat-9
+  - **Priority**: P3
+  - **Size**: S
+  - **Area**: Content
+  - **Dependencies**: []
+  - **Goal**: `/help` ページにFAQリンクや問い合わせ導線など最低限の文言を追加し、プレースホルダ状態を解消する。
+  - **Steps**:
+    1. [ ] 文言ドラフトを作成し、リンク先（FAQ/問い合わせフォーム）が未整備の場合は暫定表記を記載
+    2. [ ] `/help` ページに反映し、/contract からの導線表示を確認
+  - **Description**: 仮ページのままの `/help` を最低限有用なコンテンツにする。
+  - **Plan**: None
+
+- **Title**: [Legal] 利用規約の策定と反映
+  - **ID**: Legal-Feat-10
+  - **Priority**: P1
+  - **Size**: M
+  - **Area**: Legal
+  - **Dependencies**: []
+  - **Goal**: 最新の利用規約を策定し `/legal` に掲載、Contract ページの必須同意リンク先を正式文面に接続する。
+  - **Steps**:
+    1. [ ] 利用規約ドラフトを作成（適用日・改定日を明記）
+    2. [ ] `/legal` 配下に文面を反映し、Link先を確認
+    3. [ ] Contract ページの利用規約リンク表示とバージョン確認（必要なら改定日表記追加）
+  - **Description**: 決済前同意で参照される利用規約を正式文面に差し替え、リンクの確実性を担保する。
+  - **Plan**: `_docs/plan/Legal/terms_update.md`
 
 - **Title**: [Feat] 退会フロー実装 (Stripe Customer Portal)
   - **ID**: Membership-Feat-2
