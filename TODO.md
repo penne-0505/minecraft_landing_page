@@ -1,7 +1,7 @@
 # Project Task Management Rules
 
 ## 0. System Metadata
-- **Current Max ID**: `Next ID No: 11` (※タスク追加時にインクリメント必須)
+- **Current Max ID**: `Next ID No: 12` (※タスク追加時にインクリメント必須)
 - **ID Source of Truth**: このファイルの `Next ID No` 行が、全プロジェクトにおける唯一のID発番元である。
 
 ## 1. Task Lifecycle (State Machine)
@@ -260,3 +260,15 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 ---
 
 ## In Progress
+
+- **Title**: [Feat] Legal pages routing & rendering
+  - **ID**: Legal-Feat-11
+  - **Priority**: P1
+  - **Size**: M
+  - **Area**: Legal
+  - **Dependencies**: []
+  - **Goal**: `/legal/terms|privacy|refund` に直接アクセスして本文が表示され、フッター・Contract導線から3文書へ遷移できる。目次・印刷対応と改定履歴が機能している。
+  - **Steps**:
+    1. [x] Plan `_docs/plan/Legal/legal-pages-static-routes.md` の Tasks 1–8 を実行
+  - **Description**: 法務関連3文書を実務的な固定URLで公開し、Markdownレンダリング・目次・印刷対応を備える。
+  - **Plan**: `_docs/plan/Legal/legal-pages-static-routes.md`
