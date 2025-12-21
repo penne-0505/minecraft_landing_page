@@ -123,7 +123,7 @@ const LegalDocPage = ({ docKey }) => {
       <main className="container mx-auto px-4 md:px-6 py-14 max-w-5xl">
         <div className="flex items-center justify-start gap-3 mb-5">
           <a
-            href="/membership"
+            href="/"
             className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#5fbb4e] no-print"
           >
             <ArrowLeft size={18} />

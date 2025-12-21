@@ -8,7 +8,7 @@ const tabs = [
     label: "利用規約",
     file: "/legal/terms",
     summary:
-      "Discord メンバーシップの利用条件、禁止事項、自動更新・解約、責任範囲を定義します。",
+      "このwebサイト及びメンバーシップの利用条件、禁止事項、自動更新・解約、責任範囲を定義します。",
   },
   {
     key: "privacy",
@@ -22,7 +22,7 @@ const tabs = [
     label: "特商法表記",
     file: "/legal/tokusho",
     summary:
-      "事業者名、所在地、連絡先、販売価格、支払方法、返品・キャンセル条件などをここに記載します。",
+      "運営者情報です。",
   },
   {
     key: "refund",
