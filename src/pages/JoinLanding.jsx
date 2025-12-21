@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Crown, Gem, Hammer, Coffee, Wand2, PartyPopper, Sun, Sparkles, Ticket, Check, Mic, Phone, Quote, Clover, Sprout } from 'lucide-react';
+import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Crown, Gem, Hammer, Coffee, Wand2, PartyPopper, Sun, Sparkles, Ticket, Check, Mic, Phone, Quote, Clover, Sprout, Castle } from 'lucide-react';
 import { joinImages, galleryImages } from '../data/lpImages';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -649,7 +649,7 @@ const RefinedFeatures = () => {
                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-1 h-4 bg-slate-400"></div>
                    <div className="w-3 h-3 bg-slate-500 rounded-full absolute -top-1 left-1/2 -translate-x-1/2"></div>
                    <div className="bg-white/20 p-2 md:p-3 rounded-full text-white mb-2 md:mb-4 backdrop-blur-sm">
-                      <Hammer size={22} className="md:w-7 md:h-7" />
+                      <Castle size={22} className="md:w-7 md:h-7" />
                    </div>
                    <div className="text-white/90 font-bold text-center text-sm md:text-lg px-2 writing-vertical-rl h-[5.5rem] md:h-[6.5rem] tracking-widest opacity-80 group-hover:opacity-100">
                       建築ギルド
@@ -664,7 +664,7 @@ const RefinedFeatures = () => {
                       <Map size={22} className="md:w-7 md:h-7" />
                    </div>
                    <div className="text-white/90 font-bold text-center text-sm md:text-lg px-2 writing-vertical-rl h-[5.5rem] md:h-[6.5rem] tracking-widest opacity-80 group-hover:opacity-100">
-                      冒険パーティー
+                      冒険者
                    </div>
                    <div className="absolute -bottom-3 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm whitespace-nowrap">
                       Popular
@@ -676,7 +676,7 @@ const RefinedFeatures = () => {
                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-1 h-4 bg-slate-400"></div>
                    <div className="w-3 h-3 bg-slate-500 rounded-full absolute -top-1 left-1/2 -translate-x-1/2"></div>
                    <div className="bg-white/20 p-2 md:p-3 rounded-full text-white mb-2 md:mb-4 backdrop-blur-sm">
-                      <Coffee size={22} className="md:w-7 md:h-7" />
+                      <Pickaxe size={22} className="md:w-7 md:h-7" />
                    </div>
                    <div className="text-white/90 font-bold text-center text-sm md:text-lg px-2 writing-vertical-rl h-[5.5rem] md:h-[6.5rem] tracking-widest opacity-80 group-hover:opacity-100">
                       整地部
