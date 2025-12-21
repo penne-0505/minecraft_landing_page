@@ -1,9 +1,9 @@
 ---
 title: Temporary wiring for membership pricing CTA
-status: active
-draft_status: exploring
+status: superseded
+draft_status: n/a
 created_at: 2025-12-09
-updated_at: 2025-12-09
+updated_at: 2025-12-21
 references: []
 related_issues: []
 related_prs: []

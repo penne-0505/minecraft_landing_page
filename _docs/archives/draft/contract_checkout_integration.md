@@ -1,9 +1,9 @@
 ---
 title: Contract Checkout Integration Notes
-status: active
-draft_status: exploring
+status: superseded
+draft_status: n/a
 created_at: 2025-12-14
-updated_at: 2025-12-14
+updated_at: 2025-12-21
 references:
   - ../plan/Membership/contract_checkout_integration.md
   - contract_page_requirements.md

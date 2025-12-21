@@ -1,9 +1,9 @@
 ---
 title: Discord OAuth guilds.join での自動招待方針
-status: proposed
-draft_status: exploring
+status: superseded
+draft_status: n/a
 created_at: 2025-12-14
-updated_at: 2025-12-14
+updated_at: 2025-12-21
 references:
   - ../../plan/Membership/roadmap/plan.md
 related_issues: []
@@ -16,13 +16,13 @@ related_prs: []
 - 既存の `beginDiscordLogin` は必要箇所のみで利用し、LP CTA では Discord 招待リンクを直接開く。
 
 ## 方針（決定）
-- LPのCTAは Discord 招待URLを直接開く（単一URLに統一、フォールバックなし）。
+- LPのCTAは Discord 招待URLを直接開く（単一URLに統一）。URLが未設定の場合は無効化/案内のフォールバックを用意する。
 - OAuth/guilds.join は利用しない。Add Guild Member API 呼び出しも行わない。
 - OAuth ログイン導線は `/membership` など会員向けページに限定し、LPでは表示しない。
 - 同意文言は「Discordに参加するとコミュニティ規約に同意したものとみなします」等、招待リンク押下前に簡潔に表示（デザイン側に依頼）。
 
 ## 実装メモ
-- 招待URLは環境変数 `DISCORD_INVITE_URL` で管理し、`.env.example` にプレースホルダーを置く。現状の本番値は運用側が保持。
+- 招待URLは環境変数 `VITE_DISCORD_INVITE_URL`（フロント）/ `DISCORD_INVITE_URL`（サーバー）で管理し、`.env.example` にプレースホルダーを置く。現状の本番値は運用側が保持。未設定時はボタンを無効化し、案内を表示する。
 - `beginDiscordLogin` を LP からは呼ばない。`Header` など共通コンポーネントでのログイン導線は LP 表示時に非表示または招待リンクに切り替えるガードを検討。
 - GA/Sentry 計測イベントは「有効化予定・時期未定」とし、招待CTAのクリック/成功確認はリンククリックベースで計測する（OAuth関連イベントは不要）。
 
@@ -35,7 +35,7 @@ related_prs: []
 - 参加後に DM を送るかどうか（送る場合は Bot DM 権限が必要）。
 
 ## ToDo（実装タスクのたたき台）
-1. [ ] 招待URLの正式値を環境変数に設定し、LP CTA で参照するように実装。
+1. [ ] 招待URLの正式値を環境変数に設定し、LP CTA で参照するように実装（未設定時フォールバック含む）。
 2. [ ] LP 表示時にヘッダーのログイン導線を非表示または招待リンクに差し替えるガードを追加。
 3. [ ] 計測イベントを招待CTAクリック中心に整理（有効化時期未定と明記）。
 4. [ ] LP のCTA付近に同意文言をデザインへ依頼（OAuth表記は削除）。
