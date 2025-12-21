@@ -220,10 +220,10 @@ export default function Contract() {
   // Map PLANS to UI format
   const planInfo = PLANS[planParam] || {};
   const planDetails = {
-    name: planInfo.label ? `${planInfo.label} Plan` : "Unknown Plan",
+    name: planInfo.label ? `${planInfo.label}プラン` : "不明なプラン",
     price: `¥${planInfo.price?.toLocaleString()}`,
     interval: planInfo.unit ? `/${planInfo.unit}` : "",
-    features: ["Priority Login", "Supporter Chat", "Cosmetic items"], // Fallback if not in PLANS
+    features: ["優先ログイン", "サポーターチャット", "装飾アイテム"], // Fallback if not in PLANS
     // Styling mapping
     color: planParam === "one_month" ? "from-lime-200 to-lime-100" : (planParam === "sub_yearly" ? "from-teal-200 to-teal-100" : "from-[#a7f3d0] to-[#d1fae5]"),
     borderColor: planParam === "one_month" ? "border-lime-300" : (planParam === "sub_yearly" ? "border-teal-300" : "border-[#6ee7b7]"),
@@ -245,7 +245,7 @@ export default function Contract() {
             <>
               <Loader2 className="animate-spin w-12 h-12 text-[#5fbb4e] mx-auto mb-4" />
               <p className="text-slate-600 font-bold">
-                {oauthRedirecting ? "Discord 認証へ移動しています..." : "ページを準備しています..."}
+                {oauthRedirecting ? "Discord認証へ移動しています..." : "ページを準備しています..."}
               </p>
             </>
           )}
@@ -299,10 +299,10 @@ export default function Contract() {
             className="mb-8 md:mb-12 text-center md:text-left"
           >
             <h1 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              Confirm your support
+              サポート内容の確認
             </h1>
             <p className="font-body text-slate-500 font-bold">
-              Final step before payment. No money is charged yet.
+              決済前の最終確認です。この段階では請求は発生しません。
             </p>
           </motion.div>
 
@@ -322,7 +322,7 @@ export default function Contract() {
                     <div className="absolute -right-3 bottom-0 w-6 h-6 bg-[#f8fafc] rounded-full" />
                     
                     <span className={`self-start px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${planDetails.badgeColor}`}>
-                      Selected Plan
+                      選択したプラン
                     </span>
                     <div className="text-right">
                        <InteractiveClover />
@@ -363,7 +363,7 @@ export default function Contract() {
                         className="w-10 h-10 rounded-full bg-white shadow-sm"
                       />
                       <div className="flex flex-col">
-                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">Account</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">アカウント</span>
                         <span className="font-display font-bold text-slate-700">{user.name}</span>
                       </div>
                     </div>
@@ -379,7 +379,7 @@ export default function Contract() {
               <motion.div variants={itemVariants} className="space-y-4">
                 <h3 className="font-display text-xl font-bold text-slate-800 flex items-center gap-2">
                   <ShieldCheck className="text-[#5fbb4e]" />
-                  Permissions & Terms
+                  権限と規約
                 </h3>
                 
                 <div className="flex flex-col gap-4">
@@ -387,20 +387,20 @@ export default function Contract() {
                     checked={agreements.discordRole}
                     onChange={() => toggleAgreement('discordRole')}
                     icon={<Users size={20} />}
-                    title="Grant Discord Role"
-                    description="Automatically give you the Supporter role on our Discord server."
-                    tag="Recommended"
+                    title="Discordロールの付与"
+                    description="Discordサーバーでサポーターロールを自動的に付与します。"
+                    tag="推奨"
                   />
 
                   <CheckboxCard 
                     checked={agreements.publicListing}
                     onChange={() => toggleAgreement('publicListing')}
                     icon={<InteractiveClover />}
-                    title="Show on Leaderboard"
+                    title="リーダーボードへの表示"
                     description={
                       agreements.publicListing 
-                      ? "Your name will be listed on the public supporters page."
-                      : "You will be listed as 'Anonymous Supporter'."
+                      ? "公開サポーターページにお名前が表示されます。"
+                      : "匿名サポーターとして表示されます。"
                     }
                   />
 
@@ -435,14 +435,14 @@ export default function Contract() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-display font-bold text-slate-800 text-lg">
-                            Accept Terms of Service
+                            利用規約への同意
                           </span>
                           <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
-                            Required
+                            必須
                           </span>
                         </div>
                         <div className="font-body text-slate-500 text-sm leading-relaxed">
-                          I agree to the <a href="/legal/terms" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>Terms of Service</a> and <a href="/legal/privacy" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>. I understand this is a digital goods purchase.
+                          <a href="/legal/terms" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>利用規約</a>および<a href="/legal/privacy" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>プライバシーポリシー</a>に同意します。これはデジタルコンテンツの購入であることを理解しています。
                         </div>
                       </div>
                     </label>
@@ -457,7 +457,7 @@ export default function Contract() {
                     onClick={() => window.location.href = "/membership"}
                     className="font-body font-bold text-slate-400 hover:text-slate-600 px-4 py-3 transition-colors text-sm"
                   >
-                    Cancel & Return
+                    キャンセルして戻る
                   </button>
 
                   <div className="flex flex-col gap-2 w-full md:w-auto">
@@ -476,14 +476,14 @@ export default function Contract() {
                         <Loader2 className="animate-spin" />
                       ) : (
                         <>
-                          <span>Pay with Stripe</span>
+                          <span>Stripeで決済する</span>
                           <ArrowRight size={20} strokeWidth={3} />
                         </>
                       )}
                     </button>
                     {!agreements.terms && (
                       <p className="text-center md:text-right text-xs font-bold text-orange-400 mt-2">
-                        * Please accept the terms to proceed
+                        ※ 続行するには規約への同意が必要です
                       </p>
                     )}
                   </div>
@@ -492,7 +492,7 @@ export default function Contract() {
                 <div className="mt-8 text-center">
                    <a href="/help" className="text-xs font-bold text-slate-400 hover:text-[#5865F2] transition-colors inline-flex items-center gap-1">
                      <AlertCircle size={12} />
-                     Having trouble? Visit Help Center
+                     お困りですか?ヘルプセンターをご覧ください
                    </a>
                 </div>
               </motion.div>
@@ -522,13 +522,13 @@ export default function Contract() {
                <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                  <AlertCircle size={32} />
                </div>
-               <h3 className="font-display font-bold text-xl text-slate-800 mb-2">Error</h3>
+               <h3 className="font-display font-bold text-xl text-slate-800 mb-2">エラー</h3>
                <p className="font-body text-slate-600 mb-6">{error}</p>
                <button 
                  onClick={() => setError(null)}
                  className="w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors"
                >
-                 Dismiss
+                 閉じる
                </button>
              </motion.div>
           </motion.div>
