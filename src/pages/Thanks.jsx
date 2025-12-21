@@ -1,36 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { 
+  AlertCircle,
   Check, 
   Home, 
   Copy, 
   ExternalLink, 
   MessageCircle, 
-  Gamepad2,
   Sparkles,
   PartyPopper,
-  Crown,
-  Theater
+  Crown
 } from "lucide-react";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
-import InteractiveClover from "../components/ui/InteractiveClover";
+import { PLANS } from "../constants/plans";
 
-// --- Mock Data ---
-// In a real implementation, you might fetch this based on session_id from URL
-const MOCK_USER = {
-  id: "123",
-  name: "SteveCrafter",
-  avatar: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg",
+const FALLBACK_AVATAR =
+  "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg";
+
+const PAYMENT_METHOD_LABELS = {
+  card: "Credit Card",
+  konbini: "コンビニ",
+  paypay: "PayPay",
+  bank_transfer: "Bank Transfer",
+  customer_balance: "Bank Transfer",
+  cashapp: "Cash App",
+  boleto: "Boleto",
 };
 
-const PURCHASE_DETAILS = {
-  id: "txn_8823_xh92",
-  date: new Date().toLocaleDateString(),
-  planName: "Monthly Subscription",
-  amount: "¥300",
-  paymentMethod: "Credit Card",
+const formatCurrency = (amount, currency) => {
+  if (amount == null) return null;
+  const upperCurrency = (currency || "JPY").toUpperCase();
+  try {
+    return new Intl.NumberFormat("ja-JP", {
+      style: "currency",
+      currency: upperCurrency,
+    }).format(amount);
+  } catch {
+    return `${amount} ${upperCurrency}`;
+  }
+};
+
+const resolvePaymentMethodLabel = (methods = []) => {
+  const method = methods[0];
+  if (!method) return "Stripe";
+  return PAYMENT_METHOD_LABELS[method] || method.replace("_", " ");
 };
 
 // Enhanced Confetti
@@ -62,21 +77,104 @@ const GlowAura = () => (
 
 export default function Thanks() {
   const [copied, setCopied] = useState(false);
-  const [user] = useState(() => {
+  const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("discord_user")) || MOCK_USER;
+      return JSON.parse(localStorage.getItem("discord_user")) || null;
     } catch {
-      return MOCK_USER;
+      return null;
     }
   });
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const sessionId = useMemo(() => {
+    const url = new URL(window.location.href);
+    return url.searchParams.get("session_id");
+  }, []);
+
+  useEffect(() => {
+    if (!sessionId) {
+      setError("決済セッションが見つかりませんでした。");
+      setLoading(false);
+      return;
+    }
+
+    let ignore = false;
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `/api/checkout-session?session_id=${encodeURIComponent(sessionId)}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "決済データの取得に失敗しました。");
+        }
+        const data = await res.json();
+        if (!ignore) {
+          setSession(data.session || null);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError("決済データの取得に失敗しました。時間をおいてお試しください。");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [sessionId]);
+
+  const isLoggedIn = !!(user && user.id);
+  const handleLogout = () => {
+    localStorage.removeItem("discord_user");
+    setUser(null);
+  };
 
   const handleCopyId = () => {
-    navigator.clipboard.writeText(PURCHASE_DETAILS.id);
+    if (!session?.transaction_id) return;
+    navigator.clipboard.writeText(session.transaction_id);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const planName = useMemo(() => {
+    if (!session) return "";
+    const plan = session.price_type ? PLANS[session.price_type] : null;
+    if (plan?.label) return `${plan.label} Plan`;
+    return session.line_item_name || "Supporter Plan";
+  }, [session]);
+
+  const amountText = useMemo(() => {
+    if (!session) return "";
+    return formatCurrency(session.amount_total, session.currency);
+  }, [session]);
+
+  const dateText = useMemo(() => {
+    if (!session?.created) return "";
+    const date = new Date(session.created);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("ja-JP");
+  }, [session]);
+
+  const paymentMethod = useMemo(() => {
+    if (!session) return "";
+    return resolvePaymentMethodLabel(session.payment_method_types);
+  }, [session]);
+
+  const accessBlocked = !loading && (error || !session);
 
   return (
     <div className="min-h-screen bg-[#f0f9ff] font-sans selection:bg-[#5fbb4e]/30 text-slate-800 flex flex-col overflow-hidden relative">
@@ -105,15 +203,36 @@ export default function Thanks() {
 
       <GlowAura />
       
-      <Header 
-        isLoggedIn={true} 
-        user={user} 
-        onLogin={beginDiscordLogin} 
-        onLogout={() => {}} 
-        onScrollTop={scrollToTop} 
+      <Header
+        isLoggedIn={isLoggedIn}
+        user={user}
+        onLogin={beginDiscordLogin}
+        onLogout={handleLogout}
+        onScrollTop={scrollToTop}
       />
 
       <main className="flex-grow pt-36 md:pt-44 pb-12 px-4 md:px-6 relative z-10 flex flex-col items-center">
+        {accessBlocked ? (
+          <div className="max-w-xl w-full text-center">
+            <div className="bg-white rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-100 p-8 md:p-10">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-100 text-red-600 mb-4">
+                <AlertCircle size={24} />
+              </div>
+              <h1 className="font-display text-2xl md:text-3xl font-black text-slate-800 mb-3">
+                決済情報を確認できませんでした
+              </h1>
+              <p className="font-body text-slate-500 font-bold mb-6">
+                {error || "このページは決済完了後に表示されます。"}
+              </p>
+              <a
+                href="/membership"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#5fbb4e] text-white font-bold shadow-[0_4px_0_#469e38] active:translate-y-[3px] transition-all"
+              >
+                メンバーシップへ戻る
+              </a>
+            </div>
+          </div>
+        ) : (
         <div className="max-w-xl w-full text-center">
           
           {/* Avatar Celebration Hero */}
@@ -136,7 +255,7 @@ export default function Thanks() {
             {/* Avatar with Ring */}
             <div className="relative z-10 p-2 bg-white rounded-full shadow-xl">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-yellow-300 relative bg-slate-100">
-                <img src={user.avatar || MOCK_USER.avatar} alt="User" className="w-full h-full object-cover" />
+                <img src={user?.avatar || FALLBACK_AVATAR} alt="User" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-2 -right-2 bg-[#5fbb4e] text-white p-2 rounded-full border-4 border-white shadow-lg">
                 <Check size={20} strokeWidth={4} />
@@ -168,7 +287,7 @@ export default function Thanks() {
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight leading-tight">
               Thank You,<br/>
-              <span className="text-gradient-gold">{user.name}!</span>
+              <span className="text-gradient-gold">{user?.name || "Supporter"}!</span>
             </h1>
             <p className="font-body text-slate-500 font-bold text-lg md:text-xl max-w-sm mx-auto">
               ご支援ありがとうございます！<br/>
@@ -188,52 +307,68 @@ export default function Thanks() {
               <div className="h-3 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 w-full" />
               
               <div className="p-8 pb-10">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="text-left">
-                    <span className="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-black text-[10px] uppercase tracking-wider mb-2">
-                      Official Supporter
-                    </span>
-                    <h3 className="font-display font-bold text-xl text-slate-800">
-                      {PURCHASE_DETAILS.planName}
-                    </h3>
+                {loading ? (
+                  <div className="space-y-4 text-left">
+                    <div className="h-4 w-32 bg-slate-100 rounded-full animate-pulse" />
+                    <div className="h-6 w-48 bg-slate-100 rounded-full animate-pulse" />
+                    <div className="h-8 w-24 bg-slate-100 rounded-full animate-pulse" />
                   </div>
-                  <div className="text-right">
-                    <div className="font-display font-black text-2xl text-[#5fbb4e]">
-                      {PURCHASE_DETAILS.amount}
+                ) : (
+                  <>
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="text-left">
+                        <span className="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-black text-[10px] uppercase tracking-wider mb-2">
+                          Official Supporter
+                        </span>
+                        <h3 className="font-display font-bold text-xl text-slate-800">
+                          {planName}
+                        </h3>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-display font-black text-2xl text-[#5fbb4e]">
+                          {amountText}
+                        </div>
+                        <div className="text-xs font-bold text-slate-400">Paid</div>
+                      </div>
                     </div>
-                    <div className="text-xs font-bold text-slate-400">Paid</div>
-                  </div>
-                </div>
 
-                <div className="relative h-px w-full bg-slate-200 my-6">
-                  <div className="absolute -left-10 -top-3 w-6 h-6 rounded-full bg-[#f0f9ff]" />
-                  <div className="absolute -right-10 -top-3 w-6 h-6 rounded-full bg-[#f0f9ff]" />
-                </div>
+                    <div className="relative h-px w-full bg-slate-200 my-6">
+                      <div className="absolute -left-10 -top-3 w-6 h-6 rounded-full bg-[#f0f9ff]" />
+                      <div className="absolute -right-10 -top-3 w-6 h-6 rounded-full bg-[#f0f9ff]" />
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4 text-left font-body text-sm">
-                  <div>
-                    <div className="text-slate-400 text-xs font-bold mb-1">Date</div>
-                    <div className="font-bold text-slate-700">{PURCHASE_DETAILS.date}</div>
-                  </div>
-                  <div>
-                    <div className="text-slate-400 text-xs font-bold mb-1">Payment</div>
-                    <div className="font-bold text-slate-700 flex items-center gap-2">
-                      {PURCHASE_DETAILS.paymentMethod}
+                    <div className="grid grid-cols-2 gap-4 text-left font-body text-sm">
+                      <div>
+                        <div className="text-slate-400 text-xs font-bold mb-1">Date</div>
+                        <div className="font-bold text-slate-700">{dateText}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-xs font-bold mb-1">Payment</div>
+                        <div className="font-bold text-slate-700 flex items-center gap-2">
+                          {paymentMethod}
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        <div className="text-slate-400 text-xs font-bold mb-1">
+                          Transaction ID
+                        </div>
+                        <div 
+                          onClick={handleCopyId}
+                          className={`group flex items-center justify-between bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 transition-colors ${
+                            session?.transaction_id ? "cursor-pointer hover:bg-slate-100" : "cursor-default opacity-60"
+                          }`}
+                        >
+                          <span className="font-mono text-slate-600 text-xs">
+                            {session.transaction_id || "N/A"}
+                          </span>
+                          <span className="text-slate-400 group-hover:text-[#5fbb4e] transition-colors">
+                            {copied ? <Check size={14} /> : <Copy size={14} />}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="col-span-2">
-                    <div className="text-slate-400 text-xs font-bold mb-1">Transaction ID</div>
-                    <div 
-                      onClick={handleCopyId}
-                      className="group flex items-center justify-between bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 cursor-pointer hover:bg-slate-100 transition-colors"
-                    >
-                      <span className="font-mono text-slate-600 text-xs">{PURCHASE_DETAILS.id}</span>
-                      <span className="text-slate-400 group-hover:text-[#5fbb4e] transition-colors">
-                        {copied ? <Check size={14} /> : <Copy size={14} />}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -243,10 +378,10 @@ export default function Thanks() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12"
+            className="flex justify-center mb-12"
           >
             {/* Discord Action */}
-            <div className="group relative bg-white p-1 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="group relative bg-white p-1 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-[#5865F2] to-[#404EED] rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300 -z-10 blur-sm translate-y-2" />
               <div className="bg-white rounded-xl p-5 h-full flex flex-col items-center text-center border border-slate-100 group-hover:border-[#5865F2]/30 transition-colors">
                 <div className="w-12 h-12 bg-[#5865F2]/10 text-[#5865F2] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
@@ -257,27 +392,14 @@ export default function Thanks() {
                 <p className="text-xs text-slate-500 font-bold mb-4">
                   ロールが付与されました！<br/>限定チャンネルへようこそ。
                 </p>
-                <button className="mt-auto w-full py-2 rounded-lg bg-[#5865F2] text-white text-sm font-bold shadow-[0_3px_0_#4752c4] active:shadow-none active:translate-y-[3px] transition-all flex items-center justify-center gap-2">
+                <a 
+                  href={import.meta.env.VITE_DISCORD_INVITE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-auto w-full py-2 rounded-lg bg-[#5865F2] text-white text-sm font-bold shadow-[0_3px_0_#4752c4] active:shadow-none active:translate-y-[3px] transition-all flex items-center justify-center gap-2"
+                >
                   Open Discord <ExternalLink size={14} />
-                </button>
-              </div>
-            </div>
-
-            {/* Server Action */}
-            <div className="group relative bg-white p-1 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#5fbb4e] to-[#3d9e30] rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300 -z-10 blur-sm translate-y-2" />
-              <div className="bg-white rounded-xl p-5 h-full flex flex-col items-center text-center border border-slate-100 group-hover:border-[#5fbb4e]/30 transition-colors">
-                <div className="w-12 h-12 bg-[#5fbb4e]/10 text-[#5fbb4e] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <Gamepad2 size={24} fill="currentColor" className="opacity-20 absolute" />
-                  <Gamepad2 size={24} className="relative z-10" />
-                </div>
-                <h3 className="font-display font-bold text-slate-800 mb-1">Play Now</h3>
-                <p className="text-xs text-slate-500 font-bold mb-4">
-                  サーバーに参加して<br/>特典アイテムを受け取ろう！
-                </p>
-                <button className="mt-auto w-full py-2 rounded-lg bg-[#5fbb4e] text-white text-sm font-bold shadow-[0_3px_0_#4ea540] active:shadow-none active:translate-y-[3px] transition-all flex items-center justify-center gap-2">
-                  Copy IP Address <Copy size={14} />
-                </button>
+                </a>
               </div>
             </div>
           </motion.div>
@@ -287,13 +409,14 @@ export default function Thanks() {
              animate={{ opacity: 1 }}
              transition={{ delay: 0.8 }}
           >
-            <a href="/membership" className="text-slate-400 font-bold font-body text-sm hover:text-slate-600 transition-colors flex items-center justify-center gap-2 mx-auto">
+            <a href="/" className="text-slate-400 font-bold font-body text-sm hover:text-slate-600 transition-colors flex items-center justify-center gap-2 mx-auto">
               <Home size={16} />
               Return to Top Page
             </a>
           </motion.div>
 
         </div>
+        )}
       </main>
 
       <Footer onScrollTop={scrollToTop} />
