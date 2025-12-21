@@ -1,172 +1,223 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Leaf,
-} from "lucide-react";
-import { PLANS, PLAN_KEYS } from "../../constants/plans";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Check, Sparkles, Zap, Repeat, Calendar } from "lucide-react";
+import { PLANS } from "../../constants/plans";
 
 const PricingComponent = ({ onStartCheckout }) => {
-  const [cycle, setCycle] = useState("sub_monthly");
+  const [billingType, setBillingType] = useState("subscription"); // 'subscription' | 'one_time'
+  const [isYearly, setIsYearly] = useState(false);
 
-  const currentPlan = PLANS[cycle];
-  const planKeys = PLAN_KEYS;
+  // 選択状態からプランキーを解決
+  const getPlanKey = () => {
+    if (billingType === "one_time") return "one_month";
+    return isYearly ? "sub_yearly" : "sub_monthly";
+  };
 
-  const handleDragEnd = (_event, info) => {
-    const threshold = 50;
-    const currentIndex = planKeys.indexOf(cycle);
+  const planKey = getPlanKey();
+  const plan = PLANS[planKey];
+  const isRecommended = planKey === "sub_yearly";
+
+  // スワイプ操作のハンドリング
+  const handleDragEnd = (event, info) => {
     const offset = info.offset.x;
+    const threshold = 50; // 切り替え判定の移動距離
 
-    if (offset < -threshold && currentIndex < planKeys.length - 1) {
-      setCycle(planKeys[currentIndex + 1]);
-    } else if (offset > threshold && currentIndex > 0) {
-      setCycle(planKeys[currentIndex - 1]);
+    // 現在が「単発」で左にスワイプ → 「継続」へ
+    if (billingType === "one_time" && offset < -threshold) {
+      setBillingType("subscription");
+    } 
+    // 現在が「継続」で右にスワイプ → 「単発」へ
+    else if (billingType === "subscription" && offset > threshold) {
+      setBillingType("one_time");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-slate-100 p-1.5 rounded-2xl flex relative mb-8">
-        <div
-          className="absolute top-1.5 bottom-1.5 bg-white rounded-xl shadow-sm transition-all duration-300 ease-out z-0"
-          style={{
-            left:
-              cycle === "one_month"
-                ? "0.375rem"
-                : cycle === "sub_monthly"
-                ? "33.33%"
-                : "calc(66.66% - 0.375rem)",
-            width: "calc(33.33% - 0.25rem)",
-          }}
-        />
-        {planKeys.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCycle(c)}
-            className={`flex-1 relative z-10 py-2.5 text-sm font-bold capitalize transition-colors duration-300 ${
-              cycle === c ? PLANS[c].textColor : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            {PLANS[c].label}
-          </button>
-        ))}
-      </div>
-
-      <div className="relative">
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 -ml-4 md:hidden text-slate-300 animate-pulse pointer-events-none z-20">
-          <ChevronLeft size={36} strokeWidth={3} />
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-0 -mr-4 md:hidden text-slate-300 animate-pulse pointer-events-none z-20">
-          <ChevronRight size={36} strokeWidth={3} />
-        </div>
-
+    <div className="w-full max-w-4xl mx-auto px-4 flex flex-col items-center">
+      
+      {/* 1. Main Type Selector (Tabs) */}
+      <div className="bg-slate-100 p-1.5 rounded-2xl flex relative w-full max-w-sm mb-8 shadow-inner">
         <motion.div
-          key={cycle}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          whileHover={{
-            boxShadow:
-              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            borderColor:
-              cycle === "monthly"
-                ? "#86efac"
-                : cycle === "yearly"
-                ? "#5eead4"
-                : "#bef264",
+          className="absolute top-1.5 bottom-1.5 bg-white rounded-xl shadow-sm z-0"
+          initial={false}
+          animate={{
+            left: billingType === "one_time" ? "0.375rem" : "50%",
+            x: billingType === "one_time" ? 0 : "0.375rem",
+            width: "calc(50% - 0.75rem)"
           }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{ touchAction: "pan-y" }}
-          className={`bg-white border-2 rounded-[2.5rem] p-8 soft-shadow relative overflow-hidden transition-colors duration-300 ${currentPlan.borderColor} cursor-grab active:cursor-grabbing z-10`}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+        
+        <button
+          onClick={() => setBillingType("one_time")}
+          className={`flex-1 relative z-10 py-3 text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2 ${
+            billingType === "one_time" ? "text-slate-800" : "text-slate-500 hover:text-slate-700"
+          }`}
         >
-          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-            <Leaf
-              size={120}
-              className={currentPlan.textColor.replace("text-", "text-opacity-50 text-")}
-            />
-          </div>
-
-          <div className="mb-8 select-none">
-            <div
-              className={`font-bold text-sm uppercase tracking-wider mb-2 opacity-60 ${currentPlan.textColor}`}
-            >
-              {currentPlan.label} Plan
-            </div>
-            <div className="flex items-baseline gap-1 text-slate-800">
-              <span className="text-2xl font-bold">¥</span>
-              <span
-                className={`text-6xl font-black tracking-tight brand-font ${currentPlan.textColor}`}
-              >
-                {currentPlan.price.toLocaleString()}
-              </span>
-              <span className="text-slate-400 font-bold">/ {currentPlan.unit}</span>
-            </div>
-            <p className="text-slate-500 mt-2 font-bold text-sm">{currentPlan.desc}</p>
-          </div>
-
-          <ul className="space-y-4 mb-8 select-none">
-            {["サポーター限定Discordロール", "ゲーム内ネームカラー変更", "限定チャンネルへのアクセス"].map(
-              (feature, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-3 text-slate-700 font-bold text-sm group/item"
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-white shrink-0 ${currentPlan.iconBg} group-hover/item:scale-110 transition-transform`}
-                  >
-                    <Check size={12} strokeWidth={4} />
-                  </div>
-                  {feature}
-                </li>
-              )
-            )}
-          </ul>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            if (typeof onStartCheckout === "function") {
-              onStartCheckout(cycle);
-            } else {
-              fetch("/create-checkout-session", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  priceType: cycle,
-                  discord_user_id: "placeholder-user",
-                }),
-              })
-                .then((res) =>
-                  console.log("CTA test ping /create-checkout-session", res.status)
-                )
-                .catch((err) => console.error("CTA test ping failed", err));
-            }
-          }}
-          className={`w-full text-white py-4 rounded-2xl font-bold text-lg btn-push flex justify-center items-center gap-2 group transition-colors duration-300 ${currentPlan.bgColor} ${currentPlan.hoverBgColor} ${currentPlan.shadowStyle} active:shadow-none active:translate-y-[5px]`}
+          <Zap size={16} className={billingType === "one_time" ? "text-lime-500 fill-current" : ""} />
+          単発サポート
+        </button>
+        
+        <button
+          onClick={() => setBillingType("subscription")}
+          className={`flex-1 relative z-10 py-3 text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2 ${
+            billingType === "subscription" ? "text-slate-800" : "text-slate-500 hover:text-slate-700"
+          }`}
         >
-            このプランで支援する{" "}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </motion.button>
-        </motion.div>
+          <Repeat size={16} className={billingType === "subscription" ? "text-[#5fbb4e]" : ""} />
+          継続サポート
+        </button>
       </div>
 
-      <div className="md:hidden flex justify-center gap-2 mt-6">
-        {planKeys.map((k) => (
-          <div
-            key={k}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              cycle === k ? "bg-slate-400 scale-125" : "bg-slate-200"
-            }`}
-          />
-        ))}
+      {/* 2. Interval Toggle (Only for Subscription) */}
+      <div className="h-12 mb-8 flex justify-center items-center">
+        <AnimatePresence mode="wait">
+          {billingType === "subscription" ? (
+            <motion.div
+              key="toggle"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-4 bg-white border border-slate-100 rounded-full px-6 py-2 shadow-sm"
+            >
+              <span 
+                className={`text-sm font-bold cursor-pointer transition-colors ${!isYearly ? "text-slate-800" : "text-slate-400"}`}
+                onClick={() => setIsYearly((prev) => !prev)}
+              >
+                月払い
+              </span>
+              
+              <button
+                onClick={() => setIsYearly(!isYearly)}
+                className={`relative w-12 h-7 rounded-full transition-colors duration-200 focus:outline-none ${
+                  isYearly ? "bg-teal-500" : "bg-slate-200"
+                }`}
+              >
+                <motion.div
+                  className="absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-md"
+                  animate={{ x: isYearly ? 20 : 0 }}
+                  transition={{ type: "spring", stiffness: 700, damping: 30 }}
+                />
+              </button>
+              
+              <div 
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setIsYearly((prev) => !prev)}
+              >
+                <span className={`text-sm font-bold transition-colors ${isYearly ? "text-slate-800" : "text-slate-400"}`}>
+                  年払い
+                </span>
+                <span className="bg-teal-100 text-teal-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide border border-teal-200 flex items-center gap-1">
+                  <Sparkles size={10} /> 2ヶ月分無料
+                </span>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="one-time-label"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.15 }}
+              className="text-sm font-bold text-slate-400 flex items-center gap-2"
+            >
+              <Calendar size={16} />
+              必要なときだけ、気軽に支援できます
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* 3. Plan Card Display */}
+      <div className="w-full max-w-md relative">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={planKey}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            
+            // Drag Properties for Swipe
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
+            style={{ touchAction: "pan-y" }} // Allow vertical scrolling
+            className="w-full cursor-grab active:cursor-grabbing"
+          >
+             <div className={`relative flex flex-col p-8 md:p-10 rounded-[2.5rem] bg-white border-4 transition-all duration-200 ${
+               isRecommended 
+                 ? "border-teal-100 shadow-[0_20px_50px_-12px_rgba(20,184,166,0.25)]" 
+                 : plan.borderColor + " shadow-xl"
+             } overflow-hidden group`}>
+                
+                {/* Background Decoration */}
+                <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${plan.bgColor} opacity-5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none`} />
+
+                {isRecommended && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-teal-500 text-white text-[10px] font-black px-4 py-1.5 rounded-b-xl uppercase tracking-wider flex items-center gap-1 shadow-md whitespace-nowrap z-10">
+                    <Sparkles size={12} fill="currentColor" /> Best Value
+                  </div>
+                )}
+
+                <div className="mb-8 text-center relative z-10">
+                  <h3 className={`font-black text-2xl mb-3 uppercase tracking-wide ${plan.textColor}`}>
+                    {plan.label} Plan
+                  </h3>
+                  <div className="flex items-baseline justify-center gap-1 text-slate-800">
+                    <span className="text-xl font-bold">¥</span>
+                    <span className={`text-6xl font-black brand-font tracking-tighter ${plan.textColor}`}>
+                      {plan.price.toLocaleString()}
+                    </span>
+                    <span className="text-slate-400 font-bold text-sm">/ {plan.unit}</span>
+                  </div>
+                  <p className="text-sm text-slate-500 font-bold mt-4 bg-slate-50 inline-block px-4 py-1 rounded-full">
+                    {plan.desc}
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-10 flex-1 relative z-10">
+                  <div className="w-full h-px bg-slate-100 mb-6" />
+                  {[
+                    "サポーター限定Discordロール", 
+                    "ゲーム内での優遇", 
+                    "限定チャンネルへのアクセス",
+                    "今後さらに追加予定...",
+                    isRecommended ? "限定プロファイルバッジ" : null
+                  ].filter(Boolean).map((feature, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05, duration: 0.2 }}
+                      className="flex items-center gap-4 text-slate-700 font-bold"
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-white shadow-sm ${plan.iconBg} bg-gradient-to-br from-white/20 to-transparent`}>
+                        <Check size={14} strokeWidth={4} />
+                      </div>
+                      <span className="text-sm md:text-base">{feature}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (typeof onStartCheckout === "function") {
+                      onStartCheckout(planKey);
+                    }
+                  }}
+                  className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 transition-all btn-push text-white shadow-lg active:shadow-none active:translate-y-[4px] relative overflow-hidden group ${plan.bgColor} ${plan.hoverBgColor}`}
+                >
+                  <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-200 rounded-2xl pointer-events-none"></span>
+                  <span className="relative z-10 flex items-center gap-2">
+                    このプランで始める <ArrowRight size={20} strokeWidth={3} />
+                  </span>
+                </button>
+             </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

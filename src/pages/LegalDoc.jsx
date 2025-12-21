@@ -6,7 +6,7 @@ import { legalDocs } from "../legal/config";
 const LegalDoc = () => {
   const { docKey } = useParams();
   if (!docKey || !legalDocs[docKey]) {
-    return <Navigate to="/legal" replace />;
+    return <Navigate to="/legal/terms" replace />;
   }
   return <LegalDocPage docKey={docKey} />;
 };

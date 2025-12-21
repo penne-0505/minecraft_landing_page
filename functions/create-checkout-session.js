@@ -40,6 +40,7 @@ export async function onRequest(context) {
 	const {
 		priceType,
 		discord_user_id,
+		avatar_url,
 		consent_display,
 		consent_roles,
 		consent_terms,
@@ -67,17 +68,22 @@ export async function onRequest(context) {
 	const mode = priceType === "one_month" ? "payment" : "subscription";
 
 	try {
-		const customer = await findOrCreateCustomer(stripe, discord_user_id);
+		const customer = await findOrCreateCustomer(
+			stripe,
+			discord_user_id,
+			avatar_url
+		);
 
 		const session = await stripe.checkout.sessions.create({
 			mode,
 			customer: customer.id,
 			line_items: [{ price: priceId, quantity: 1 }],
-			success_url: `${APP_BASE_URL}/?checkout=success`,
-			cancel_url: `${APP_BASE_URL}/?checkout=cancel`,
+			success_url: `${APP_BASE_URL}/thanks?session_id={CHECKOUT_SESSION_ID}`,
+			cancel_url: `${APP_BASE_URL}/membership?checkout=cancel`,
 			metadata: {
 				discord_user_id,
 				price_type: priceType,
+				avatar_url: avatar_url || "",
 				consent_display: String(consent_display),
 				consent_roles: String(consent_roles),
 				consent_terms: String(consent_terms),
@@ -111,15 +117,21 @@ export async function onRequest(context) {
 	}
 }
 
-async function findOrCreateCustomer(stripe, discordUserId) {
+async function findOrCreateCustomer(stripe, discordUserId, avatarUrl) {
 	// Stripe Search API is available for Customers. We rely on metadata to find the same user.
 	const query = `metadata['discord_user_id']:'${discordUserId}'`;
 	const existing = await stripe.customers.search({ query, limit: 1 });
 	if (existing?.data?.length) {
-		return existing.data[0];
+		const customer = existing.data[0];
+		if (avatarUrl && customer.metadata?.avatar_url !== avatarUrl) {
+			await stripe.customers.update(customer.id, {
+				metadata: { avatar_url: avatarUrl },
+			});
+		}
+		return customer;
 	}
 
 	return stripe.customers.create({
-		metadata: { discord_user_id: discordUserId },
+		metadata: { discord_user_id: discordUserId, avatar_url: avatarUrl || "" },
 	});
 }

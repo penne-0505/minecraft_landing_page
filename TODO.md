@@ -1,7 +1,7 @@
 # Project Task Management Rules
 
 ## 0. System Metadata
-- **Current Max ID**: `Next ID No: 12` (※タスク追加時にインクリメント必須)
+- **Current Max ID**: `Next ID No: 18` (※タスク追加時にインクリメント必須)
 - **ID Source of Truth**: このファイルの `Next ID No` 行が、全プロジェクトにおける唯一のID発番元である。
 
 ## 1. Task Lifecycle (State Machine)
@@ -186,61 +186,31 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 
 ## Backlog
 
-- **Title**: [Chore] Discord誘導URLを本番値に差し替え
-  - **ID**: Membership-Chore-13
+- **Title**: [Enhance] Cancellation ページを実処理と連携
+  - **ID**: Membership-Enhance-17
   - **Priority**: P2
-  - **Size**: XS
-- **Area**: Membership
-- **Dependencies**: []
-- **Goal**: 決済完了後に表示されるサクセスバナーの Discord 誘導リンクが正式な本番チャンネル URL に更新されている。
-- **Steps**:
-  1. [ ] 正式なDiscordチャンネルURLを運営から取得
-  2. [ ] `src/pages/Home.jsx` のサクセスバナー内リンクを差し替え、必要なら TODO を完了扱いにする
-  3. [ ] 動作確認後、タスクを Done に移す
-- **Description**: 暫定URL `https://discord.com/channels/746587719827980359/947145885798776902` を、本番の誘導先に置き換える。
-- **Plan**: None
-
-- **Title**: [Legal] 利用規約の策定と反映
-  - **ID**: Legal-Feat-10
-  - **Priority**: P1
-  - **Size**: M
-  - **Area**: Legal
-  - **Dependencies**: []
-  - **Goal**: 最新の利用規約を策定し `/legal` に掲載、Contract ページの必須同意リンク先を正式文面に接続する。
-  - **Steps**:
-    1. [ ] 利用規約ドラフトを作成（適用日・改定日を明記）
-    2. [ ] `/legal` 配下に文面を反映し、Link先を確認
-    3. [ ] Contract ページの利用規約リンク表示とバージョン確認（必要なら改定日表記追加）
-  - **Description**: 決済前同意で参照される利用規約を正式文面に差し替え、リンクの確実性を担保する。
-  - **Plan**: `_docs/plan/Legal/terms_update.md`
-
-- **Title**: [Feat] 退会フロー実装 (Stripe Customer Portal)
-  - **ID**: Membership-Feat-2
-  - **Priority**: P1
   - **Size**: M
   - **Area**: Membership
-  - **Dependencies**: [Membership-Feat-1]
-  - **Goal**: Customer Portal からキャンセルした際、次回課金日まで利用でき、その後ロールが自動剥奪されること。
+  - **Dependencies**: []
+  - **Goal**: `/cancellation` が実際のサブスク解約状態に基づいて表示され、未解約や未ログイン時は適切に案内されている。
   - **Steps**:
-    1. [ ] Plan M2 に沿って Portal リンクとキャンセル誘導 UI を組み込み
-    2. [ ] `customer.subscription.updated/deleted` Webhook を処理し、ロール剥奪スケジュールを Bot に通知
-    3. [ ] ステージングでキャンセル→更新日後の剥奪までの一連を検証
-  - **Description**: 退会を自助化しつつ、次回課金日までの利用を許容するポリシーを実装する。
-  - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
+    1. [ ] Plan の "Tasks" に従い、Subscription 状態取得 API とフロントの表示切替を実装する
+    2. [ ] Plan の "Test Plan" に従い、解約済み/未解約/未ログインの表示を確認する
+  - **Description**: Stripe Portal での解約結果を反映し、モック表示を実データ連携に切り替える。
+  - **Plan**: `_docs/plan/Membership/cancellation_page_integration.md`
 
-- **Title**: [Feat] Discord誘導LP公開 (一般公開CTA)
-  - **ID**: Membership-Feat-3
+- **Title**: [Enhance] Thanks ページを実処理と連携
+  - **ID**: Membership-Enhance-16
   - **Priority**: P1
   - **Size**: M
   - **Area**: Membership
   - **Dependencies**: []
-  - **Goal**: 一般公開LPから Discord 招待への CVR を計測でき、ヘッダーからメンバーシップページへ導線を設置すること。
+  - **Goal**: `/thanks` が実決済データに基づいて表示され、`session_id` が無い直接アクセスは遮断されている。
   - **Steps**:
-    1. [ ] `_docs/draft/design_request.md` をデザイナーへ共有し、初稿レビュー
-    2. [ ] Plan M3 に沿って LP セクション構成とコピー占位テキストを実装
-    3. [ ] レスポンシブ (モバイル優先) で崩れないことを確認し、CTAリンクを本番招待に差し替え
-  - **Description**: Discord 参加を主CTAとする一般公開LPを構築し、既存メンバーシップページへの導線も付与する。
-  - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
+    1. [ ] Plan の "Tasks" に従い、Checkout Success URL と API/フロント連携を実装する
+    2. [ ] Plan の "Test Plan" に従い、成功/失敗シナリオの表示を確認する
+  - **Description**: Stripe Checkout 完了後のサンクス画面を実データ連携に切り替え、直接アクセスを防止する。
+  - **Plan**: `_docs/plan/Membership/thanks_page_integration.md`
 
 - **Title**: [Chore] GA4/Sentry 本番接続
   - **ID**: Membership-Chore-5
@@ -256,20 +226,24 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
   - **Description**: 準備済みの no-op フックを実配信に接続し、計測・エラー監視を本番運用可能な状態にする。
   - **Plan**: `_docs/plan/Membership/roadmap/plan.md`
 
+- **Title**: [Chore] Tailwind CDN の本番利用を廃止
+  - **ID**: Membership-Chore-15
+  - **Priority**: P2
+  - **Size**: S
+  - **Area**: Membership
+  - **Dependencies**: []
+  - **Goal**: 本番配信で `cdn.tailwindcss.com` を使わず、ビルド生成したCSSを読み込む構成になる。
+  - **Steps**:
+    1. [ ] Tailwind を PostCSS/CLI で導入し、ビルド時に CSS を生成する
+    2. [ ] `index.html` から CDN スクリプトを削除し、生成CSSを読み込む
+    3. [ ] `npm run build` / `npm run preview` で表示崩れがないことを確認する
+  - **Description**: 本番配信時の警告解消とパフォーマンス最適化のため、Tailwind CDN の利用をやめてビルド生成に切り替える。
+  - **Plan**: None
+
+---
+
 ## Ready
 
 ---
 
 ## In Progress
-
-- **Title**: [Feat] Legal pages routing & rendering
-  - **ID**: Legal-Feat-11
-  - **Priority**: P1
-  - **Size**: M
-  - **Area**: Legal
-  - **Dependencies**: []
-  - **Goal**: `/legal/terms|privacy|refund` に直接アクセスして本文が表示され、フッター・Contract導線から3文書へ遷移できる。目次・印刷対応と改定履歴が機能している。
-  - **Steps**:
-    1. [x] Plan `_docs/plan/Legal/legal-pages-static-routes.md` の Tasks 1–8 を実行
-  - **Description**: 法務関連3文書を実務的な固定URLで公開し、Markdownレンダリング・目次・印刷対応を備える。
-  - **Plan**: `_docs/plan/Legal/legal-pages-static-routes.md`

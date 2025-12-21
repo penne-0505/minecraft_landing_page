@@ -13,6 +13,7 @@ import { trackEvent, captureError } from "../analytics";
 import { PLANS } from "../constants/plans";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import { beginDiscordLogin } from "../utils/discordAuth";
 import InteractiveClover from "../components/ui/InteractiveClover";
 
 const CheckboxCard = ({ 
@@ -190,6 +191,7 @@ export default function Contract() {
         body: JSON.stringify({
           priceType: planParam,
           discord_user_id: user.id,
+          avatar_url: user.avatar || null,
           consent_display: agreements.publicListing,
           consent_roles: agreements.discordRole,
           consent_terms: agreements.terms,
@@ -282,7 +284,7 @@ export default function Contract() {
       <Header 
         isLoggedIn={true} 
         user={user} 
-        onLogin={() => {}} 
+        onLogin={beginDiscordLogin} 
         onLogout={() => { localStorage.removeItem("discord_user"); setUser(null); }} 
         onScrollTop={() => window.scrollTo(0, 0)} 
       />
