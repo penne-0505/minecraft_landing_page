@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Membership from "./pages/Membership.jsx";
 import Placeholder from "./pages/Placeholder.jsx";
 import JoinLanding from "./pages/JoinLanding.jsx";
@@ -10,10 +10,23 @@ import LegalDoc from "./pages/LegalDoc.jsx";
 import Thanks from "./pages/Thanks.jsx";
 import Cancellation from "./pages/Cancellation.jsx";
 import Supporters from "./pages/Supporters.jsx";
+import { trackPageView } from "./analytics";
+
+const RouteAnalytics = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = `${location.pathname}${location.search}`;
+    trackPageView(path);
+  }, [location.pathname, location.search]);
+
+  return null;
+};
 
 const App = () => {
   return (
     <BrowserRouter>
+      <RouteAnalytics />
       <Routes>
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/" element={<JoinLanding />} />

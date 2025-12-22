@@ -10,6 +10,8 @@
     "lint": "echo \"No linter configured\""
   },
   "dependencies": {
+    "@sentry/browser": "^10.32.1",
+    "@sentry/cloudflare": "^10.32.1",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^11.5.2",
     "lucide-react": "^0.556.0",
