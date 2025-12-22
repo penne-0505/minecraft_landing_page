@@ -113,24 +113,27 @@ const PricingComponent = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
               transition={{ duration: 0.15 }}
-              className="flex items-center gap-4 bg-white border border-slate-100 rounded-full px-6 py-2 shadow-sm"
+              className="flex items-stretch gap-4 bg-white border border-slate-100 rounded-full px-6 py-2 shadow-sm"
             >
-              <span 
-                className={`text-sm font-bold cursor-pointer transition-colors ${!isYearly ? "text-slate-800" : "text-slate-400"}`}
+              <button
+                type="button"
                 onClick={() => {
                   if (locked) return;
-                  setIsYearly((prev) => !prev);
+                  setIsYearly(false);
                 }}
+                className={`flex-1 flex items-center justify-end px-2 py-3 -my-2 text-sm font-bold transition-colors ${
+                  !isYearly ? "text-slate-800" : "text-slate-400"
+                }`}
               >
                 月払い
-              </span>
+              </button>
               
               <button
                 onClick={() => {
                   if (locked) return;
                   setIsYearly(!isYearly);
                 }}
-                className={`relative w-12 h-7 rounded-full transition-colors duration-200 focus:outline-none ${
+                className={`relative w-12 h-7 rounded-full transition-colors duration-200 focus:outline-none shrink-0 self-center ${
                   isYearly ? "bg-teal-500" : "bg-slate-200"
                 }`}
               >
@@ -141,20 +144,25 @@ const PricingComponent = ({
                 />
               </button>
               
-              <div 
-                className="flex items-center gap-2 cursor-pointer"
+              <button
+                type="button"
                 onClick={() => {
                   if (locked) return;
-                  setIsYearly((prev) => !prev);
+                  setIsYearly(true);
                 }}
+                className="flex-1 flex items-center justify-start gap-2 px-2 py-3 -my-2"
               >
-                <span className={`text-sm font-bold transition-colors ${isYearly ? "text-slate-800" : "text-slate-400"}`}>
+                <span
+                  className={`text-sm font-bold transition-colors ${
+                    isYearly ? "text-slate-800" : "text-slate-400"
+                  }`}
+                >
                   年払い
                 </span>
                 <span className="bg-teal-100 text-teal-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide border border-teal-200 flex items-center gap-1">
                   <Sparkles size={10} /> 2ヶ月分無料
                 </span>
-              </div>
+              </button>
             </motion.div>
           ) : (
             <motion.div

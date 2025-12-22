@@ -27,7 +27,7 @@ export async function onRequest(context) {
 		!STRIPE_PRICE_SUB_YEARLY ||
 		!APP_BASE_URL
 	) {
-		return new Response("Missing Stripe env", { status: 500 });
+		return new Response("Missing Stripe env", { status: 503 });
 	}
 
 	let body;
