@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Crown, Gem, Hammer, Coffee, Wand2, PartyPopper, Sun, Sparkles, Ticket, Check, Mic, Phone, Quote, Clover, Sprout, Castle } from 'lucide-react';
+import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Crown, Gem, Hammer, Coffee, Wand2, PartyPopper, Sun, Sparkles, Ticket, Check, Mic, Phone, Quote, Clover, Sprout, Castle, Pickaxe } from 'lucide-react';
 import { joinImages, galleryImages } from '../data/lpImages';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
