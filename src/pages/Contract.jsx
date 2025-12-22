@@ -454,7 +454,7 @@ export default function Contract() {
                         <Loader2 className="animate-spin" />
                       ) : (
                         <>
-                          <span>{agreements.terms ? "Stripeで決済する" : "同意が必要"}</span>
+                          <span>{(agreements.terms && agreements.discordRole) ? "Stripeで決済する" : "同意が必要"}</span>
                           <ArrowRight size={20} strokeWidth={3} />
                         </>
                       )}
