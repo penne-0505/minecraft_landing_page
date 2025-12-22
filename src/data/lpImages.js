@@ -12,20 +12,62 @@ import landingHeroLeft1024 from "../assets/images/landing/hero/sub-left-1024.web
 import landingHeroLeft1600 from "../assets/images/landing/hero/sub-left-1600.webp";
 
 import landingGalleryColumn11 from "../assets/images/landing/gallery/column-1-1.webp";
+import landingGalleryColumn11_640 from "../assets/images/landing/gallery/column-1-1-640.webp";
+import landingGalleryColumn11_1024 from "../assets/images/landing/gallery/column-1-1-1024.webp";
+import landingGalleryColumn11_1600 from "../assets/images/landing/gallery/column-1-1-1600.webp";
 import landingGalleryColumn12 from "../assets/images/landing/gallery/column-1-2.webp";
+import landingGalleryColumn12_640 from "../assets/images/landing/gallery/column-1-2-640.webp";
+import landingGalleryColumn12_1024 from "../assets/images/landing/gallery/column-1-2-1024.webp";
+import landingGalleryColumn12_1600 from "../assets/images/landing/gallery/column-1-2-1600.webp";
 import landingGalleryColumn13 from "../assets/images/landing/gallery/column-1-3.webp";
+import landingGalleryColumn13_640 from "../assets/images/landing/gallery/column-1-3-640.webp";
+import landingGalleryColumn13_1024 from "../assets/images/landing/gallery/column-1-3-1024.webp";
+import landingGalleryColumn13_1600 from "../assets/images/landing/gallery/column-1-3-1600.webp";
 import landingGalleryColumn21 from "../assets/images/landing/gallery/column-2-1.webp";
+import landingGalleryColumn21_640 from "../assets/images/landing/gallery/column-2-1-640.webp";
+import landingGalleryColumn21_1024 from "../assets/images/landing/gallery/column-2-1-1024.webp";
+import landingGalleryColumn21_1600 from "../assets/images/landing/gallery/column-2-1-1600.webp";
 import landingGalleryColumn22 from "../assets/images/landing/gallery/column-2-2.webp";
+import landingGalleryColumn22_640 from "../assets/images/landing/gallery/column-2-2-640.webp";
+import landingGalleryColumn22_1024 from "../assets/images/landing/gallery/column-2-2-1024.webp";
+import landingGalleryColumn22_1600 from "../assets/images/landing/gallery/column-2-2-1600.webp";
 import landingGalleryColumn23 from "../assets/images/landing/gallery/column-2-3.webp";
+import landingGalleryColumn23_640 from "../assets/images/landing/gallery/column-2-3-640.webp";
+import landingGalleryColumn23_1024 from "../assets/images/landing/gallery/column-2-3-1024.webp";
+import landingGalleryColumn23_1600 from "../assets/images/landing/gallery/column-2-3-1600.webp";
 import landingGalleryColumn24 from "../assets/images/landing/gallery/column-2-4.webp";
+import landingGalleryColumn24_640 from "../assets/images/landing/gallery/column-2-4-640.webp";
+import landingGalleryColumn24_1024 from "../assets/images/landing/gallery/column-2-4-1024.webp";
+import landingGalleryColumn24_1600 from "../assets/images/landing/gallery/column-2-4-1600.webp";
 import landingGalleryColumn25 from "../assets/images/landing/gallery/column-2-5.webp";
+import landingGalleryColumn25_640 from "../assets/images/landing/gallery/column-2-5-640.webp";
+import landingGalleryColumn25_1024 from "../assets/images/landing/gallery/column-2-5-1024.webp";
+import landingGalleryColumn25_1600 from "../assets/images/landing/gallery/column-2-5-1600.webp";
 import landingGalleryColumn31 from "../assets/images/landing/gallery/column-3-1.webp";
+import landingGalleryColumn31_640 from "../assets/images/landing/gallery/column-3-1-640.webp";
+import landingGalleryColumn31_1024 from "../assets/images/landing/gallery/column-3-1-1024.webp";
+import landingGalleryColumn31_1600 from "../assets/images/landing/gallery/column-3-1-1600.webp";
 import landingGalleryColumn32 from "../assets/images/landing/gallery/column-3-2.webp";
+import landingGalleryColumn32_640 from "../assets/images/landing/gallery/column-3-2-640.webp";
+import landingGalleryColumn32_1024 from "../assets/images/landing/gallery/column-3-2-1024.webp";
+import landingGalleryColumn32_1600 from "../assets/images/landing/gallery/column-3-2-1600.webp";
 import landingGalleryColumn33 from "../assets/images/landing/gallery/column-3-3.webp";
+import landingGalleryColumn33_640 from "../assets/images/landing/gallery/column-3-3-640.webp";
+import landingGalleryColumn33_1024 from "../assets/images/landing/gallery/column-3-3-1024.webp";
+import landingGalleryColumn33_1600 from "../assets/images/landing/gallery/column-3-3-1600.webp";
 
 import landingCtaRight from "../assets/images/landing/bottom_cta/right.webp";
+import landingCtaRight_640 from "../assets/images/landing/bottom_cta/right-640.webp";
+import landingCtaRight_1024 from "../assets/images/landing/bottom_cta/right-1024.webp";
+import landingCtaRight_1600 from "../assets/images/landing/bottom_cta/right-1600.webp";
 import landingCtaLeft from "../assets/images/landing/bottom_cta/left.webp";
+import landingCtaLeft_640 from "../assets/images/landing/bottom_cta/left-640.webp";
+import landingCtaLeft_1024 from "../assets/images/landing/bottom_cta/left-1024.webp";
+import landingCtaLeft_1600 from "../assets/images/landing/bottom_cta/left-1600.webp";
 import landingCtaOverlay from "../assets/images/landing/bottom_cta/overlay.webp";
+import landingCtaOverlay_640 from "../assets/images/landing/bottom_cta/overlay-640.webp";
+import landingCtaOverlay_1024 from "../assets/images/landing/bottom_cta/overlay-1024.webp";
+import landingCtaOverlay_1600 from "../assets/images/landing/bottom_cta/overlay-1600.webp";
 
 import membershipHero1 from "../assets/images/membership/hero-1.webp";
 import membershipHero1_640 from "../assets/images/membership/hero-1-640.webp";
@@ -88,32 +130,212 @@ export const joinImages = {
 			{ src: landingHeroLeft, width: 2436 },
 		])
 	),
-	memoryWide: withImage(landingGalleryColumn21, 1627, 752),
-	memoryTall: withImage(landingGalleryColumn11, 2048, 1536),
-	memoryStd1: withImage(landingGalleryColumn22, 2048, 1536),
-	memoryStd2: withImage(landingGalleryColumn25, 2048, 1536),
-	ctaRight: withImage(landingCtaRight, 2048, 1536),
-	ctaLeft: withImage(landingCtaLeft, 2160, 1620),
-	ctaOverlay: withImage(landingCtaOverlay, 2816, 1536),
+	memoryWide: withImage(
+		landingGalleryColumn21,
+		1627,
+		752,
+		buildSrcSet([
+			{ src: landingGalleryColumn21_640, width: 640 },
+			{ src: landingGalleryColumn21_1024, width: 1024 },
+			{ src: landingGalleryColumn21_1600, width: 1600 },
+			{ src: landingGalleryColumn21, width: 1627 },
+		])
+	),
+	memoryTall: withImage(
+		landingGalleryColumn11,
+		2048,
+		1536,
+		buildSrcSet([
+			{ src: landingGalleryColumn11_640, width: 640 },
+			{ src: landingGalleryColumn11_1024, width: 1024 },
+			{ src: landingGalleryColumn11_1600, width: 1600 },
+			{ src: landingGalleryColumn11, width: 2048 },
+		])
+	),
+	memoryStd1: withImage(
+		landingGalleryColumn22,
+		2048,
+		1536,
+		buildSrcSet([
+			{ src: landingGalleryColumn22_640, width: 640 },
+			{ src: landingGalleryColumn22_1024, width: 1024 },
+			{ src: landingGalleryColumn22_1600, width: 1600 },
+			{ src: landingGalleryColumn22, width: 2048 },
+		])
+	),
+	memoryStd2: withImage(
+		landingGalleryColumn25,
+		2048,
+		1536,
+		buildSrcSet([
+			{ src: landingGalleryColumn25_640, width: 640 },
+			{ src: landingGalleryColumn25_1024, width: 1024 },
+			{ src: landingGalleryColumn25_1600, width: 1600 },
+			{ src: landingGalleryColumn25, width: 2048 },
+		])
+	),
+	ctaRight: withImage(
+		landingCtaRight,
+		2048,
+		1536,
+		buildSrcSet([
+			{ src: landingCtaRight_640, width: 640 },
+			{ src: landingCtaRight_1024, width: 1024 },
+			{ src: landingCtaRight_1600, width: 1600 },
+			{ src: landingCtaRight, width: 2048 },
+		])
+	),
+	ctaLeft: withImage(
+		landingCtaLeft,
+		2160,
+		1620,
+		buildSrcSet([
+			{ src: landingCtaLeft_640, width: 640 },
+			{ src: landingCtaLeft_1024, width: 1024 },
+			{ src: landingCtaLeft_1600, width: 1600 },
+			{ src: landingCtaLeft, width: 2160 },
+		])
+	),
+	ctaOverlay: withImage(
+		landingCtaOverlay,
+		2816,
+		1536,
+		buildSrcSet([
+			{ src: landingCtaOverlay_640, width: 640 },
+			{ src: landingCtaOverlay_1024, width: 1024 },
+			{ src: landingCtaOverlay_1600, width: 1600 },
+			{ src: landingCtaOverlay, width: 2816 },
+		])
+	),
 };
 
 export const galleryImages = {
 	column1: [
-		withImage(landingGalleryColumn11, 2048, 1536),
-		withImage(landingGalleryColumn12, 2160, 1620),
-		withImage(landingGalleryColumn13, 1920, 1080),
+		withImage(
+			landingGalleryColumn11,
+			2048,
+			1536,
+			buildSrcSet([
+				{ src: landingGalleryColumn11_640, width: 640 },
+				{ src: landingGalleryColumn11_1024, width: 1024 },
+				{ src: landingGalleryColumn11_1600, width: 1600 },
+				{ src: landingGalleryColumn11, width: 2048 },
+			])
+		),
+		withImage(
+			landingGalleryColumn12,
+			2160,
+			1620,
+			buildSrcSet([
+				{ src: landingGalleryColumn12_640, width: 640 },
+				{ src: landingGalleryColumn12_1024, width: 1024 },
+				{ src: landingGalleryColumn12_1600, width: 1600 },
+				{ src: landingGalleryColumn12, width: 2160 },
+			])
+		),
+		withImage(
+			landingGalleryColumn13,
+			1920,
+			1080,
+			buildSrcSet([
+				{ src: landingGalleryColumn13_640, width: 640 },
+				{ src: landingGalleryColumn13_1024, width: 1024 },
+				{ src: landingGalleryColumn13_1600, width: 1600 },
+				{ src: landingGalleryColumn13, width: 1920 },
+			])
+		),
 	],
 	column2: [
-		withImage(landingGalleryColumn21, 1627, 752),
-		withImage(landingGalleryColumn22, 2048, 1536),
-		withImage(landingGalleryColumn23, 1792, 828),
-		withImage(landingGalleryColumn24, 2160, 1620),
-		withImage(landingGalleryColumn25, 2048, 1536),
+		withImage(
+			landingGalleryColumn21,
+			1627,
+			752,
+			buildSrcSet([
+				{ src: landingGalleryColumn21_640, width: 640 },
+				{ src: landingGalleryColumn21_1024, width: 1024 },
+				{ src: landingGalleryColumn21_1600, width: 1600 },
+				{ src: landingGalleryColumn21, width: 1627 },
+			])
+		),
+		withImage(
+			landingGalleryColumn22,
+			2048,
+			1536,
+			buildSrcSet([
+				{ src: landingGalleryColumn22_640, width: 640 },
+				{ src: landingGalleryColumn22_1024, width: 1024 },
+				{ src: landingGalleryColumn22_1600, width: 1600 },
+				{ src: landingGalleryColumn22, width: 2048 },
+			])
+		),
+		withImage(
+			landingGalleryColumn23,
+			1792,
+			828,
+			buildSrcSet([
+				{ src: landingGalleryColumn23_640, width: 640 },
+				{ src: landingGalleryColumn23_1024, width: 1024 },
+				{ src: landingGalleryColumn23_1600, width: 1600 },
+				{ src: landingGalleryColumn23, width: 1792 },
+			])
+		),
+		withImage(
+			landingGalleryColumn24,
+			2160,
+			1620,
+			buildSrcSet([
+				{ src: landingGalleryColumn24_640, width: 640 },
+				{ src: landingGalleryColumn24_1024, width: 1024 },
+				{ src: landingGalleryColumn24_1600, width: 1600 },
+				{ src: landingGalleryColumn24, width: 2160 },
+			])
+		),
+		withImage(
+			landingGalleryColumn25,
+			2048,
+			1536,
+			buildSrcSet([
+				{ src: landingGalleryColumn25_640, width: 640 },
+				{ src: landingGalleryColumn25_1024, width: 1024 },
+				{ src: landingGalleryColumn25_1600, width: 1600 },
+				{ src: landingGalleryColumn25, width: 2048 },
+			])
+		),
 	],
 	column3: [
-		withImage(landingGalleryColumn31, 1920, 1080),
-		withImage(landingGalleryColumn32, 2160, 1620),
-		withImage(landingGalleryColumn33, 2048, 1536),
+		withImage(
+			landingGalleryColumn31,
+			1920,
+			1080,
+			buildSrcSet([
+				{ src: landingGalleryColumn31_640, width: 640 },
+				{ src: landingGalleryColumn31_1024, width: 1024 },
+				{ src: landingGalleryColumn31_1600, width: 1600 },
+				{ src: landingGalleryColumn31, width: 1920 },
+			])
+		),
+		withImage(
+			landingGalleryColumn32,
+			2160,
+			1620,
+			buildSrcSet([
+				{ src: landingGalleryColumn32_640, width: 640 },
+				{ src: landingGalleryColumn32_1024, width: 1024 },
+				{ src: landingGalleryColumn32_1600, width: 1600 },
+				{ src: landingGalleryColumn32, width: 2160 },
+			])
+		),
+		withImage(
+			landingGalleryColumn33,
+			2048,
+			1536,
+			buildSrcSet([
+				{ src: landingGalleryColumn33_640, width: 640 },
+				{ src: landingGalleryColumn33_1024, width: 1024 },
+				{ src: landingGalleryColumn33_1600, width: 1600 },
+				{ src: landingGalleryColumn33, width: 2048 },
+			])
+		),
 	],
 };
 

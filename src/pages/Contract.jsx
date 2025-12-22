@@ -3,18 +3,17 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Check, 
-  ShieldCheck, 
-  Users, 
   AlertCircle, 
   Loader2, 
   ArrowRight,
+  ScrollText
 } from "lucide-react";
 import { trackEvent, captureError } from "../analytics";
-import { PLANS } from "../constants/plans";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
-import InteractiveClover from "../components/ui/InteractiveClover";
+import PricingComponent from "../components/ui/PricingComponent";
+import Divider from "../components/ui/Divider";
 
 const CheckboxCard = ({ 
   checked, 
@@ -64,6 +63,8 @@ const CheckboxCard = ({
       <motion.div 
         layout
         className="w-5 h-5 bg-white rounded-full shadow-sm"
+        animate={{ x: checked ? 20 : 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
       />
     </div>
   </div>
@@ -91,7 +92,6 @@ export default function Contract() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [oauthRedirecting, setOauthRedirecting] = useState(false);
 
   const appBaseUrl = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
   const redirectUriClient = import.meta.env.VITE_DISCORD_REDIRECT_URI || `${appBaseUrl}/auth/callback`;
@@ -166,11 +166,8 @@ export default function Contract() {
     if (url.searchParams.get("code")) return;
 
     if (!user) {
-      const timer = setTimeout(() => {
-        beginDiscordLogin();
-        setOauthRedirecting(true);
-      }, 1000);
-      return () => clearTimeout(timer);
+      beginDiscordLogin();
+      return;
     }
   }, [user, planParam]);
 
@@ -179,7 +176,7 @@ export default function Contract() {
   };
 
   const handlePayment = async () => {
-    if (!user || !planParam || !agreements.terms) return;
+    if (!user || !planParam || !agreements.terms || !agreements.discordRole) return;
     
     setIsLoading(true);
     trackEvent("checkout_start", { priceType: planParam });
@@ -201,7 +198,7 @@ export default function Contract() {
       if (!res.ok) {
         const text = await res.text();
         captureError(new Error("Checkout create failed"), { priceType: planParam, text });
-        setError("決済セッションの作成に失敗しました。");
+        setError("決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。");
         setIsLoading(false);
         return;
       }
@@ -212,25 +209,12 @@ export default function Contract() {
       }
     } catch (err) {
       captureError(err, { stage: "checkout_start_contract", priceType: planParam });
-      setError("ネットワークエラーが発生しました。");
+      setError("ネットワークエラーが発生しました。しばらくしてからもう一度お試しください。");
       setIsLoading(false);
     }
   };
 
-  // Map PLANS to UI format
-  const planInfo = PLANS[planParam] || {};
-  const planDetails = {
-    name: planInfo.label ? `${planInfo.label}プラン` : "不明なプラン",
-    price: `¥${planInfo.price?.toLocaleString()}`,
-    interval: planInfo.unit ? `/${planInfo.unit}` : "",
-    features: ["優先ログイン", "サポーターチャット", "装飾アイテム"], // Fallback if not in PLANS
-    // Styling mapping
-    color: planParam === "one_month" ? "from-lime-200 to-lime-100" : (planParam === "sub_yearly" ? "from-teal-200 to-teal-100" : "from-[#a7f3d0] to-[#d1fae5]"),
-    borderColor: planParam === "one_month" ? "border-lime-300" : (planParam === "sub_yearly" ? "border-teal-300" : "border-[#6ee7b7]"),
-    badgeColor: planParam === "one_month" ? "text-lime-700 bg-lime-100" : (planParam === "sub_yearly" ? "text-teal-700 bg-teal-100" : "text-emerald-700 bg-emerald-100"),
-  };
-
-  const isPayable = agreements.terms && !isLoading;
+  const isPayable = agreements.terms && agreements.discordRole && !isLoading;
 
   if (!user) {
     return (
@@ -273,10 +257,11 @@ export default function Contract() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans selection:bg-[#5fbb4e]/30 text-slate-800 flex flex-col">
+    <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white flex flex-col">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Outfit:wght@500;700;900&display=swap');
-        .font-display { font-family: 'Outfit', sans-serif; }
+        /* Align fonts with membership page */
+        body { font-family: 'M PLUS Rounded 1c', sans-serif; }
+        h1, h2, h3, .brand-font, .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }
         .btn-push:active { transform: translateY(4px); box-shadow: none !important; }
       `}</style>
@@ -287,25 +272,13 @@ export default function Contract() {
         onLogin={beginDiscordLogin} 
         onLogout={() => { localStorage.removeItem("discord_user"); setUser(null); }} 
         onScrollTop={() => window.scrollTo(0, 0)} 
+        brandHref="/membership"
       />
 
-      <main className="flex-grow pt-24 pb-12 px-4 md:px-6">
+      <main className="flex-grow pt-32 pb-12 px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           
           {/* Page Title */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 md:mb-12 text-center md:text-left"
-          >
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              サポート内容の確認
-            </h1>
-            <p className="font-body text-slate-500 font-bold">
-              決済前の最終確認です。この段階では請求は発生しません。
-            </p>
-          </motion.div>
-
           <motion.div 
             variants={containerVariants}
             initial="hidden"
@@ -316,86 +289,32 @@ export default function Contract() {
             {/* Left Col: Plan Card */}
             <motion.div variants={itemVariants} className="lg:col-span-5 order-2 lg:order-1">
               <div className="sticky top-28">
-                <div className={`relative overflow-hidden rounded-[24px] bg-white border-2 ${planDetails.borderColor} shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)]`}>
-                  <div className={`h-32 bg-gradient-to-br ${planDetails.color} p-6 flex flex-col justify-between relative`}>
-                    <div className="absolute -left-3 bottom-0 w-6 h-6 bg-[#f8fafc] rounded-full" />
-                    <div className="absolute -right-3 bottom-0 w-6 h-6 bg-[#f8fafc] rounded-full" />
-                    
-                    <span className={`self-start px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${planDetails.badgeColor}`}>
-                      選択したプラン
-                    </span>
-                    <div className="text-right">
-                       <InteractiveClover />
-                    </div>
-                  </div>
-
-                  <div className="p-8 pt-6 bg-white relative">
-                    <div className="absolute top-0 left-4 right-4 border-t-2 border-dashed border-slate-200"></div>
-
-                    <h2 className="font-display text-2xl font-bold text-slate-800 mb-1">
-                      {planDetails.name}
-                    </h2>
-                    <div className="flex items-baseline mb-6">
-                      <span className="font-display text-4xl font-black text-slate-900 tracking-tight">
-                        {planDetails.price}
-                      </span>
-                      <span className="font-body text-slate-400 font-bold ml-1 text-sm">
-                        {planDetails.interval}
-                      </span>
-                    </div>
-
-                    <div className="space-y-3 mb-8">
-                      {planDetails.features.map((feat, i) => (
-                        <div key={i} className="flex items-center gap-3 text-slate-600 font-body font-bold text-sm">
-                          <div className="w-5 h-5 rounded-full bg-[#ecfdf5] flex items-center justify-center shrink-0">
-                            <Check size={12} className="text-[#059669]" strokeWidth={3} />
-                          </div>
-                          {feat}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* User Context */}
-                    <div className="bg-slate-50 rounded-xl p-4 flex items-center gap-3 border border-slate-100">
-                      <img 
-                        src={user.avatar || "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg"} 
-                        alt={user.name} 
-                        className="w-10 h-10 rounded-full bg-white shadow-sm"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wide">アカウント</span>
-                        <span className="font-display font-bold text-slate-700">{user.name}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <PricingComponent
+                  initialPlanKey={planParam}
+                  hideCTA
+                  compact
+                />
               </div>
             </motion.div>
 
             {/* Right Col: Agreements & Action */}
             <div className="lg:col-span-7 order-1 lg:order-2 space-y-8">
+              <motion.div variants={itemVariants} className="mb-2 text-left">
+                <h1 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+                  サポート内容の確認
+                </h1>
+                <p className="font-body text-slate-500 font-bold">
+                  決済前の最終確認です。この段階では請求は発生しません。
+                </p>
+              </motion.div>
               
               {/* Agreements Section */}
               <motion.div variants={itemVariants} className="space-y-4">
-                <h3 className="font-display text-xl font-bold text-slate-800 flex items-center gap-2">
-                  <ShieldCheck className="text-[#5fbb4e]" />
-                  権限と規約
-                </h3>
-                
                 <div className="flex flex-col gap-4">
-                  <CheckboxCard 
-                    checked={agreements.discordRole}
-                    onChange={() => toggleAgreement('discordRole')}
-                    icon={<Users size={20} />}
-                    title="Discordロールの付与"
-                    description="Discordサーバーでサポーターロールを自動的に付与します。"
-                    tag="推奨"
-                  />
-
                   <CheckboxCard 
                     checked={agreements.publicListing}
                     onChange={() => toggleAgreement('publicListing')}
-                    icon={<InteractiveClover />}
+                    icon={<ScrollText />}
                     title="リーダーボードへの表示"
                     description={
                       agreements.publicListing 
@@ -404,7 +323,46 @@ export default function Contract() {
                     }
                   />
 
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-3">
+                    <label 
+                      className={`
+                        group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer select-none
+                        ${agreements.discordRole 
+                          ? 'border-[#5fbb4e] bg-[#ecfdf5]/40' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                        }
+                      `}
+                    >
+                      <div className="relative mt-0.5">
+                        <input 
+                          type="checkbox" 
+                          className="peer sr-only" 
+                          checked={agreements.discordRole}
+                          onChange={() => toggleAgreement('discordRole')}
+                        />
+                        <div className={`
+                          w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200
+                          ${agreements.discordRole 
+                            ? 'bg-[#5fbb4e] border-[#5fbb4e]' 
+                            : 'bg-white border-slate-300 group-hover:border-slate-400'
+                          }
+                        `}>
+                          <Check size={16} className="text-white" strokeWidth={4} />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-display font-bold text-slate-800 text-lg">Discordロールの付与</span>
+                          <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                            必須
+                          </span>
+                        </div>
+                        <p className="font-body text-slate-500 text-sm leading-tight">
+                          ゲーム内特典付与のため、サポーターロールを自動付与します。
+                        </p>
+                      </div>
+                    </label>
+
                     <label 
                       className={`
                         group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer select-none
@@ -442,7 +400,26 @@ export default function Contract() {
                           </span>
                         </div>
                         <div className="font-body text-slate-500 text-sm leading-relaxed">
-                          <a href="/legal/terms" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>利用規約</a>および<a href="/legal/privacy" className="text-[#5fbb4e] underline hover:text-[#469e38]" onClick={(e) => e.stopPropagation()}>プライバシーポリシー</a>に同意します。これはデジタルコンテンツの購入であることを理解しています。
+                          <a
+                            href="/legal/terms"
+                            className="text-[#5fbb4e] underline hover:text-[#469e38]"
+                            onClick={(e) => e.stopPropagation()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            利用規約
+                          </a>
+                          および
+                          <a
+                            href="/legal/privacy"
+                            className="text-[#5fbb4e] underline hover:text-[#469e38]"
+                            onClick={(e) => e.stopPropagation()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            プライバシーポリシー
+                          </a>
+                          に同意します。これはデジタルコンテンツの購入であることを理解しています。
                         </div>
                       </div>
                     </label>
@@ -451,7 +428,8 @@ export default function Contract() {
               </motion.div>
 
               {/* Actions Section */}
-              <motion.div variants={itemVariants} className="pt-4 border-t border-slate-200">
+              <motion.div variants={itemVariants} className="pt-4 space-y-4">
+                <Divider className="border-slate-200" />
                 <div className="flex flex-col-reverse md:flex-row gap-4 md:items-center justify-between">
                   <button 
                     onClick={() => window.location.href = "/membership"}
@@ -476,24 +454,12 @@ export default function Contract() {
                         <Loader2 className="animate-spin" />
                       ) : (
                         <>
-                          <span>Stripeで決済する</span>
+                          <span>{agreements.terms ? "Stripeで決済する" : "同意が必要"}</span>
                           <ArrowRight size={20} strokeWidth={3} />
                         </>
                       )}
                     </button>
-                    {!agreements.terms && (
-                      <p className="text-center md:text-right text-xs font-bold text-orange-400 mt-2">
-                        ※ 続行するには規約への同意が必要です
-                      </p>
-                    )}
                   </div>
-                </div>
-                
-                <div className="mt-8 text-center">
-                   <a href="/help" className="text-xs font-bold text-slate-400 hover:text-[#5865F2] transition-colors inline-flex items-center gap-1">
-                     <AlertCircle size={12} />
-                     お困りですか?ヘルプセンターをご覧ください
-                   </a>
                 </div>
               </motion.div>
 

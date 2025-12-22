@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Crown, Gem, Hammer, Coffee, Wand2, PartyPopper, Sun, Sparkles, Ticket, Check, Mic, Phone, Quote, Clover, Sprout, Castle, Pickaxe } from 'lucide-react';
 import { joinImages, galleryImages } from '../data/lpImages';
 import Header from '../components/layout/Header';
@@ -32,6 +32,21 @@ const TOKENS = {
     soft: '0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(50,60,90,0.05), inset 0 1px 0 rgba(255,255,255,1)',
     push: (color) => `0 4px 0 ${color}`,
   }
+};
+
+const JOIN_LANDING_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Caveat:wght@400;700;900&family=Zen+Kurenaido&display=swap";
+
+const ensureJoinLandingFonts = () => {
+  if (typeof document === "undefined") return;
+  const existing = document.querySelector('link[data-join-landing-fonts="true"]');
+  if (existing) return;
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = JOIN_LANDING_FONTS_HREF;
+  link.setAttribute("data-join-landing-fonts", "true");
+  document.head.appendChild(link);
 };
 
 const IMAGE_SIZES = {
@@ -270,7 +285,7 @@ const Hero = () => {
                   caption="ラクダだ！"
                   image={joinImages.heroRight}
                   sizes={IMAGE_SIZES.heroRight}
-                  loading="eager"
+                  loading="lazy"
                   fetchPriority="low"
                   rotate="rotate-3"
                   className={activeHeroPhoto === "right" ? "scale-105 !shadow-2xl" : ""}
@@ -285,7 +300,7 @@ const Hero = () => {
                   caption="ふたりでブランコ"
                   image={joinImages.heroLeft}
                   sizes={IMAGE_SIZES.heroLeft}
-                  loading="eager"
+                  loading="lazy"
                   fetchPriority="low"
                   rotate="-rotate-3"
                   className={activeHeroPhoto === "left" ? "scale-105 !shadow-2xl" : ""}
@@ -335,7 +350,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column1[0].src}
                           srcSet={galleryImages.column1[0].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Landscape" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -359,7 +374,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column1[1].src}
                           srcSet={galleryImages.column1[1].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Main hall" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -371,7 +386,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column1[2].src}
                           srcSet={galleryImages.column1[2].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Night work" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -399,7 +414,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column2[0].src}
                           srcSet={galleryImages.column2[0].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Night view" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -411,7 +426,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column2[1].src}
                           srcSet={galleryImages.column2[1].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Square view" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -423,7 +438,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column2[2].src}
                           srcSet={galleryImages.column2[2].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Gathering" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -435,7 +450,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column2[3].src}
                           srcSet={galleryImages.column2[3].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Nature" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -447,7 +462,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column2[4].src}
                           srcSet={galleryImages.column2[4].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Square view 2" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -463,7 +478,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column3[0].src}
                           srcSet={galleryImages.column3[0].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Home" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -475,7 +490,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column3[1].src}
                           srcSet={galleryImages.column3[1].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Structure" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -499,7 +514,7 @@ const MemoryLane = () => {
                         <img 
                           src={galleryImages.column3[2].src}
                           srcSet={galleryImages.column3[2].srcSet}
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async"
                           alt="Riverside" 
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                         />
@@ -904,6 +919,10 @@ export default function JoinLanding() {
     }
   };
 
+  useEffect(() => {
+    ensureJoinLandingFonts();
+  }, []);
+
   const discordInviteProps = HAS_DISCORD_INVITE_URL
     ? { href: DISCORD_INVITE_URL, target: "_blank", rel: "noopener noreferrer" }
     : {
@@ -948,8 +967,6 @@ export default function JoinLanding() {
     <div className="min-h-screen bg-[#f8fafc] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white">
       {/* Styles for Custom Animations & Fonts */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@400;700;900&family=Caveat:wght@400;700;900&family=Zen+Kurenaido&display=swap');
-        
         :root {
           --font-display: 'Outfit', sans-serif;
           --font-body: 'M PLUS Rounded 1c', sans-serif;

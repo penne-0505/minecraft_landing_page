@@ -169,7 +169,6 @@ const Supporters = () => {
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans selection:bg-[#5fbb4e]/30 text-slate-800">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700;900&display=swap');
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }
       `}</style>

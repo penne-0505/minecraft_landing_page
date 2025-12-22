@@ -129,7 +129,6 @@ export default function CancellationSuccessPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-slate-300 text-slate-800 flex flex-col overflow-hidden relative">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700;900&display=swap');
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }
       `}</style>

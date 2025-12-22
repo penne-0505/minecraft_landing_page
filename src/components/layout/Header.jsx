@@ -15,6 +15,7 @@ const Header = ({
   navPosition = "center",
   rightSlot,
   mobileNavAction,
+  brandHref = "/",
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const hasNav = navItems.length > 0;
@@ -45,11 +46,11 @@ const Header = ({
 
   const handleBrandClick = () => {
     if (typeof window !== "undefined") {
-      if (window.location.pathname === "/") {
+      if (window.location.pathname === brandHref) {
         onScrollTop?.();
         return;
       }
-      window.location.href = "/";
+      window.location.href = brandHref;
       return;
     }
     onScrollTop?.();

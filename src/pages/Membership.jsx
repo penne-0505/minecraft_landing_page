@@ -183,7 +183,6 @@ const Membership = () => {
   return (
     <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white overflow-x-hidden relative">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700;900&display=swap');
         
         body { font-family: 'M PLUS Rounded 1c', sans-serif; }
         h1, h2, h3, .brand-font { font-family: 'Outfit', sans-serif; }

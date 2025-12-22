@@ -3,7 +3,7 @@ title: LP Image Bundling Guide
 status: active
 draft_status: n/a
 created_at: 2025-12-20
-updated_at: 2025-12-21
+updated_at: 2025-12-22
 references:
   - _docs/draft/lp_image_delivery_r2_transformations.md
   - _docs/draft/design_tokens.md
@@ -30,9 +30,9 @@ related_prs: []
 - **Membership Hero**: `membership/hero-1.webp`〜`membership/hero-4.webp`（必要に応じて `-640/-1024/-1600` を付与）
 
 ## レスポンシブ配信ルール
-- 現状は **単一ファイル** を使用し、`srcset` は実寸幅の1エントリで付与する。
-- 複数サイズが必要な場合は **640 / 1024 / 1600** を追加し、`srcset` を拡張する。
+- **Gallery / CTA は 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
 - **Hero は 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
+- バリアント追加が難しい場合は実寸幅1エントリの `srcset` でも可とするが、初期表示速度の改善優先で追加を検討する。
 - `sizes` はレイアウトに合わせて明示する。
   - **全幅**: `sizes="100vw"`
   - **2/3 幅**: `sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 66vw"`

@@ -1,7 +1,7 @@
 # Project Task Management Rules
 
 ## 0. System Metadata
-- **Current Max ID**: `Next ID No: 18` (※タスク追加時にインクリメント必須)
+- **Current Max ID**: `Next ID No: 19` (※タスク追加時にインクリメント必須)
 - **ID Source of Truth**: このファイルの `Next ID No` 行が、全プロジェクトにおける唯一のID発番元である。
 
 ## 1. Task Lifecycle (State Machine)
@@ -221,3 +221,17 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 ---
 
 ## In Progress
+
+- **Title**: [Perf] LP パフォーマンス改善 (perf_insight 対応)
+  - **ID**: Membership-Perf-18
+  - **Priority**: P1
+  - **Size**: M
+  - **Area**: Membership
+  - **Dependencies**: []
+  - **Goal**: Tailwind CDN 廃止・ルート分割・画像/フォント最適化が反映され、FCP/TBT/Speed Index 改善に必要な変更がビルドで有効になっている。
+  - **Steps**:
+    1. [ ] Plan の Scope/Tasks に従い、Tailwind ビルド・コード分割・画像/フォント最適化を実装する
+    2. [ ] Plan の Test Plan に従い、`npm run dev`/`npm run build`/`npm run preview` で表示確認する
+    3. [ ] 変更に伴うドキュメント更新を実施し、references を追記する
+  - **Description**: perf_insight.md の指摘をベースに、LP のレンダリングブロック/不要 JS/画像サイズ過大/フォント読み込みを改善する。
+  - **Plan**: `_docs/plan/Membership/performance-optimizations/plan.md`

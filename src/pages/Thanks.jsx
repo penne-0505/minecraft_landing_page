@@ -179,7 +179,6 @@ export default function Thanks() {
   return (
     <div className="min-h-screen bg-[#f0f9ff] font-sans selection:bg-[#5fbb4e]/30 text-slate-800 flex flex-col overflow-hidden relative">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Outfit:wght@500;700;900&display=swap');
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }
         .text-gradient-gold {
