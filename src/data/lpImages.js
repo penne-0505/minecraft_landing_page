@@ -1,5 +1,4 @@
 import landingHeroMain from "../assets/images/landing/hero/main.webp";
-import landingHeroMain320 from "../assets/images/landing/hero/main-320.webp";
 import landingHeroMain480 from "../assets/images/landing/hero/main-480.webp";
 import landingHeroMain640 from "../assets/images/landing/hero/main-640.webp";
 import landingHeroMain1024 from "../assets/images/landing/hero/main-1024.webp";
@@ -138,7 +137,6 @@ export const joinImages = {
 		1792,
 		828,
 		buildSrcSet([
-			{ src: landingHeroMain320, width: 320 },
 			{ src: landingHeroMain480, width: 480 },
 			{ src: landingHeroMain640, width: 640 },
 			{ src: landingHeroMain1024, width: 1024 },
