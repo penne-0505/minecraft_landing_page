@@ -584,7 +584,7 @@ const RefinedFeatures = () => {
                       <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-red-300 rounded flex items-center justify-center shrink-0">
                          <X size={14} className="text-red-400" />
                       </div>
-                      <span className="font-bold text-slate-400 text-base md:text-lg line-through decoration-red-400 decoration-2">毎日ログイン</span>
+                      <span className="font-bold text-slate-400 text-base md:text-lg line-through decoration-red-400 decoration-2">ログイン義務</span>
                    </div>
                    
                    {/* Obligation: Crossed Out */}
@@ -631,7 +631,7 @@ const RefinedFeatures = () => {
               気軽な冒険を。
             </h3>
             <p className="text-[#64748b] font-body text-base md:text-lg leading-relaxed mt-4 md:mt-6">
-              出席確認もログインボーナスも、建築ノルマもありません。<br/>
+              ログイン義務も、建築ノルマもありません。<br/>
               週末だけ、深夜だけ、あなたの都合で参加できます。<br/><br/>
               1週間空いても、1ヶ月空いても大丈夫。<br/>
               戻ってきたときに、自然に溶け込める場所です。
