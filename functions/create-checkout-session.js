@@ -41,7 +41,6 @@ export async function onRequest(context) {
 		priceType,
 		discord_user_id,
 		avatar_url,
-		consent_display,
 		consent_roles,
 		consent_terms,
 	} = body || {};
@@ -84,7 +83,6 @@ export async function onRequest(context) {
 				discord_user_id,
 				price_type: priceType,
 				avatar_url: avatar_url || "",
-				consent_display: String(consent_display),
 				consent_roles: String(consent_roles),
 				consent_terms: String(consent_terms),
 			},

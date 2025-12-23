@@ -5,8 +5,7 @@ import {
   Check, 
   AlertCircle, 
   Loader2, 
-  ArrowRight,
-  ScrollText
+  ArrowRight
 } from "lucide-react";
 import { trackEvent, captureError } from "../analytics";
 import Header from "../components/layout/Header";
@@ -16,7 +15,7 @@ import PricingComponent from "../components/ui/PricingComponent";
 import Divider from "../components/ui/Divider";
 import Seo from "../components/Seo";
 
-const CheckboxCard = ({ 
+export const CheckboxCard = ({ 
   checked, 
   onChange, 
   icon, 
@@ -90,7 +89,6 @@ export default function Contract() {
 
   const [agreements, setAgreements] = useState({
     discordRole: false,
-    publicListing: true,
     terms: false,
   });
 
@@ -195,7 +193,6 @@ export default function Contract() {
           priceType: planParam,
           discord_user_id: user.id,
           avatar_url: user.avatar || null,
-          consent_display: agreements.publicListing,
           consent_roles: agreements.discordRole,
           consent_terms: agreements.terms,
         }),
@@ -333,18 +330,6 @@ export default function Contract() {
               {/* Agreements Section */}
               <motion.div variants={itemVariants} className="space-y-4">
                 <div className="flex flex-col gap-4">
-                  <CheckboxCard 
-                    checked={agreements.publicListing}
-                    onChange={() => toggleAgreement('publicListing')}
-                    icon={<ScrollText />}
-                    title="リーダーボードへの表示"
-                    description={
-                      agreements.publicListing 
-                      ? "公開サポーターページにお名前が表示されます。"
-                      : "匿名サポーターとして表示されます。"
-                    }
-                  />
-
                   <div className="pt-2 space-y-3">
                     <label 
                       className={`

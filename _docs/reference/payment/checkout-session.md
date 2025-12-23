@@ -3,7 +3,7 @@ title: Checkout Session API
 status: active
 draft_status: n/a
 created_at: 2025-12-22
-updated_at: 2025-12-22
+updated_at: 2025-12-23
 references: []
 related_issues: []
 related_prs: []
@@ -23,7 +23,6 @@ Stripe Checkout セッションを作成するためのサーバーAPI仕様を�
   - `one_month` | `sub_monthly` | `sub_yearly`
 - `discord_user_id` (string, required)
 - `avatar_url` (string | null, optional)
-- `consent_display` (boolean, optional)
 - `consent_roles` (boolean, optional)
 - `consent_terms` (boolean, optional)
 
