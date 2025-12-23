@@ -228,7 +228,6 @@ const PricingComponent = ({
                     "ゲーム内での優遇", 
                     "限定チャンネルへのアクセス",
                     "今後さらに追加予定...",
-                    isRecommended ? "限定プロファイルバッジ" : null
                   ].filter(Boolean).map((feature, i) => (
                     <motion.div 
                       key={i} 
