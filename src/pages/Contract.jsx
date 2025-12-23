@@ -96,6 +96,7 @@ export default function Contract() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [oauthRedirecting, setOauthRedirecting] = useState(false);
 
   const appBaseUrl = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
   const redirectUriClient = import.meta.env.VITE_DISCORD_REDIRECT_URI || `${appBaseUrl}/auth/callback`;
@@ -149,6 +150,7 @@ export default function Contract() {
 
   const beginDiscordLogin = () => {
     trackEvent("login_start", { provider: "discord", context: "contract" });
+    setOauthRedirecting(true);
     const returnTo = `${window.location.pathname}${window.location.search}`;
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_DISCORD_CLIENT_ID || "",
