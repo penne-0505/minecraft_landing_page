@@ -186,20 +186,6 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 
 ## Backlog
 
-- **Title**: [Enhance] LP SEO 対策の総合実施
-  - **ID**: Membership-Enhance-19
-  - **Priority**: P1
-  - **Size**: M
-  - **Area**: Membership
-  - **Dependencies**: [Membership-Perf-18]
-  - **Goal**: LP の Technical/On-Page/Structured Data/Social/Performance まで含めたSEO対策が計画・実装・検証できる状態になる。
-  - **Steps**:
-    1. [ ] Plan の "Tasks" を実施し、メタデータ/構造化データ/クロール制御/画像最適化/パフォーマンス施策を反映
-    2. [ ] Plan の "Test Plan" に従い、SEOチェック・表示確認・計測を実施
-    3. [ ] 変更点に紐づくドキュメント更新と references 追記を完了
-  - **Description**: LP の検索流入を強化するため、技術SEO・オンページ・構造化データ・ソーシャル共有・パフォーマンスを網羅的に改善する。
-  - **Plan**: `_docs/plan/Membership/seo/plan.md`
-
 ---
 
 ## Ready
