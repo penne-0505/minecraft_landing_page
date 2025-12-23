@@ -3,7 +3,7 @@ title: LP Image Bundling Guide
 status: active
 draft_status: n/a
 created_at: 2025-12-20
-updated_at: 2025-12-22
+updated_at: 2025-12-23
 references:
   - _docs/draft/lp_image_delivery_r2_transformations.md
   - _docs/draft/design_tokens.md
@@ -30,8 +30,8 @@ related_prs: []
 - **Membership Hero**: `membership/hero-1.webp`〜`membership/hero-4.webp`（必要に応じて `-640/-1024/-1600` を付与）
 
 ## レスポンシブ配信ルール
-- **Gallery / CTA は 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
-- **Hero は 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
+- **Gallery / CTA は 320 / 480 / 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
+- **Hero は 320 / 480 / 640 / 1024 / 1600 のバリアントを生成し、`srcset` に含める。**
 - バリアント追加が難しい場合は実寸幅1エントリの `srcset` でも可とするが、初期表示速度の改善優先で追加を検討する。
 - `sizes` はレイアウトに合わせて明示する。
   - **全幅**: `sizes="100vw"`
@@ -53,6 +53,8 @@ related_prs: []
 ### ImageMagick 例（任意でバリアント生成）
 ```bash
 magick input.jpg -strip -quality 82 output.webp
+magick input.jpg -strip -quality 82 -resize 320x>  output-320.webp
+magick input.jpg -strip -quality 82 -resize 480x>  output-480.webp
 magick input.jpg -strip -quality 82 -resize 640x>  output-640.webp
 magick input.jpg -strip -quality 82 -resize 1024x> output-1024.webp
 magick input.jpg -strip -quality 82 -resize 1600x> output-1600.webp
