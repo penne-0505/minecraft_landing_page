@@ -3,6 +3,8 @@ import { MessageCircle, Calendar, Map, X, ArrowRight, Flag, Camera, BookOpen, Cr
 import { joinImages, galleryImages } from '../data/lpImages';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import Seo from "../components/Seo";
+import { getSiteDefaults, normalizeUrl } from "../utils/seo";
 import discordIcon from '../assets/icons/Discord-Symbol-White.svg';
 
 // --- Design Tokens & Constants ---
@@ -913,6 +915,52 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
 // --- Main App Component ---
 
 export default function JoinLanding() {
+  const defaults = getSiteDefaults();
+  const canonical = normalizeUrl(defaults.baseUrl, "/");
+  const ogImage =
+    defaults.ogImage ||
+    normalizeUrl(defaults.baseUrl, joinImages.heroMain?.src);
+  const joinTitle = "Discordメンバー募集";
+  const joinDescription =
+    "建築・冒険・雑談まで自由に遊べるDiscordコミュニティ。900名が集まるサーバーの参加方法や雰囲気を紹介します。";
+  const organization = {
+    "@type": "Organization",
+    "@id": canonical ? `${canonical}#organization` : undefined,
+    name: defaults.siteName,
+    url: canonical || defaults.baseUrl,
+  };
+  if (defaults.logo) {
+    organization.logo = defaults.logo;
+  }
+  if (defaults.socials.length > 0) {
+    organization.sameAs = defaults.socials;
+  }
+
+  const schema =
+    defaults.baseUrl && canonical
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            organization,
+            {
+              "@type": "WebSite",
+              "@id": `${canonical}#website`,
+              url: canonical,
+              name: defaults.siteName,
+              publisher: { "@id": `${canonical}#organization` },
+            },
+            {
+              "@type": "WebPage",
+              "@id": `${canonical}#webpage`,
+              url: canonical,
+              name: joinTitle,
+              description: joinDescription,
+              isPartOf: { "@id": `${canonical}#website` },
+              about: { "@id": `${canonical}#organization` },
+            },
+          ],
+        }
+      : null;
   const scrollToTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -965,6 +1013,15 @@ export default function JoinLanding() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white">
+      <Seo
+        title={joinTitle}
+        description={joinDescription}
+        path="/"
+        image={ogImage}
+        type="website"
+        schema={schema}
+        schemaId="join-landing"
+      />
       {/* Styles for Custom Animations & Fonts */}
       <style>{`
         :root {

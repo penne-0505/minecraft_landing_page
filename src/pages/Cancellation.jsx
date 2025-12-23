@@ -12,6 +12,7 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
 import { PLANS } from "../constants/plans";
+import Seo from "../components/Seo";
 
 const FALLBACK_AVATAR =
   "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg";
@@ -36,6 +37,9 @@ const Raindrop = ({ delay, x }) => (
 );
 
 export default function CancellationSuccessPage() {
+  const cancellationTitle = "解約手続き";
+  const cancellationDescription =
+    "メンバーシップの解約状況と次回更新日の案内ページです。";
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("discord_user")) || null;
@@ -128,6 +132,13 @@ export default function CancellationSuccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-slate-300 text-slate-800 flex flex-col overflow-hidden relative">
+      <Seo
+        title={cancellationTitle}
+        description={cancellationDescription}
+        path="/cancellation"
+        type="website"
+        noIndex
+      />
       <style>{`
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }

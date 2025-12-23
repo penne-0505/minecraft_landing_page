@@ -14,6 +14,7 @@ import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
 import PricingComponent from "../components/ui/PricingComponent";
 import Divider from "../components/ui/Divider";
+import Seo from "../components/Seo";
 
 const CheckboxCard = ({ 
   checked, 
@@ -73,6 +74,9 @@ const CheckboxCard = ({
 export default function Contract() {
   const [searchParams] = useSearchParams();
   const planParam = searchParams.get("plan");
+  const contractTitle = "プラン申し込み";
+  const contractDescription =
+    "メンバーシップの申し込み前に条件を確認し、決済へ進みます。";
 
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("discord_user");
@@ -218,23 +222,32 @@ export default function Contract() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0f9ff]">
-        <div className="text-center space-y-3">
-          {error ? (
-            <>
-              <div className="text-red-600 font-black text-lg">{error}</div>
-              <div className="text-sm text-slate-500">数秒後に /membership へ戻ります。</div>
-            </>
-          ) : (
-            <>
-              <Loader2 className="animate-spin w-12 h-12 text-[#5fbb4e] mx-auto mb-4" />
-              <p className="text-slate-600 font-bold">
-                {oauthRedirecting ? "Discord認証へ移動しています..." : "ページを準備しています..."}
-              </p>
-            </>
-          )}
+      <>
+        <Seo
+          title={contractTitle}
+          description={contractDescription}
+          path="/contract"
+          type="website"
+          noIndex
+        />
+        <div className="min-h-screen flex items-center justify-center bg-[#f0f9ff]">
+          <div className="text-center space-y-3">
+            {error ? (
+              <>
+                <div className="text-red-600 font-black text-lg">{error}</div>
+                <div className="text-sm text-slate-500">数秒後に /membership へ戻ります。</div>
+              </>
+            ) : (
+              <>
+                <Loader2 className="animate-spin w-12 h-12 text-[#5fbb4e] mx-auto mb-4" />
+                <p className="text-slate-600 font-bold">
+                  {oauthRedirecting ? "Discord認証へ移動しています..." : "ページを準備しています..."}
+                </p>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -258,6 +271,13 @@ export default function Contract() {
 
   return (
     <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white flex flex-col">
+      <Seo
+        title={contractTitle}
+        description={contractDescription}
+        path="/contract"
+        type="website"
+        noIndex
+      />
       <style>{`
         /* Align fonts with membership page */
         body { font-family: 'M PLUS Rounded 1c', sans-serif; }

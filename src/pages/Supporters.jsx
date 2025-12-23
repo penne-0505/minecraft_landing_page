@@ -4,6 +4,7 @@ import { Search, Crown, Star, Shield } from "lucide-react";
 import Header from "../components/layout/Header.jsx";
 import Footer from "../components/layout/Footer.jsx";
 import { beginDiscordLogin } from "../utils/discordAuth";
+import Seo from "../components/Seo";
 
 const planStyles = {
   Yearly: {
@@ -77,6 +78,9 @@ const SupporterCard = ({ supporter, index }) => (
 const PAGE_SIZE = 9;
 
 const Supporters = () => {
+  const supportersTitle = "サポーター一覧";
+  const supportersDescription =
+    "コミュニティを支えてくれているサポーターの一覧ページです。";
   const [searchTerm, setSearchTerm] = useState("");
   const [supporters, setSupporters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -168,6 +172,13 @@ const Supporters = () => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans selection:bg-[#5fbb4e]/30 text-slate-800">
+      <Seo
+        title={supportersTitle}
+        description={supportersDescription}
+        path="/supporters"
+        type="website"
+        noIndex
+      />
       <style>{`
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }

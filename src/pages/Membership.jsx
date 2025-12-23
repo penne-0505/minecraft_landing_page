@@ -22,6 +22,7 @@ import FAQItem from "../components/ui/FAQItem";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { homeHeroImages } from "../data/lpImages";
+import Seo from "../components/Seo";
 
 const Membership = () => {
   const [user, setUser] = useState(() => {
@@ -180,8 +181,18 @@ const Membership = () => {
     });
   };
 
+  const membershipTitle = "メンバーシップ";
+  const membershipDescription =
+    "サポータープランの内容や参加手順、よくある質問をまとめています。";
+
   return (
     <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans selection:bg-[#5fbb4e] selection:text-white overflow-x-hidden relative">
+      <Seo
+        title={membershipTitle}
+        description={membershipDescription}
+        path="/membership"
+        type="website"
+      />
       <style>{`
         
         body { font-family: 'M PLUS Rounded 1c', sans-serif; }

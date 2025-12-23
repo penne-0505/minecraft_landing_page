@@ -15,6 +15,7 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
 import { PLANS } from "../constants/plans";
+import Seo from "../components/Seo";
 
 const FALLBACK_AVATAR =
   "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg";
@@ -76,6 +77,8 @@ const GlowAura = () => (
 );
 
 export default function Thanks() {
+  const thanksTitle = "お申し込み完了";
+  const thanksDescription = "メンバーシップ参加後の案内と次のステップをまとめています。";
   const [copied, setCopied] = useState(false);
   const [user, setUser] = useState(() => {
     try {
@@ -178,6 +181,13 @@ export default function Thanks() {
 
   return (
     <div className="min-h-screen bg-[#f0f9ff] font-sans selection:bg-[#5fbb4e]/30 text-slate-800 flex flex-col overflow-hidden relative">
+      <Seo
+        title={thanksTitle}
+        description={thanksDescription}
+        path="/thanks"
+        type="website"
+        noIndex
+      />
       <style>{`
         .font-display { font-family: 'Outfit', sans-serif; }
         .font-body { font-family: 'M PLUS Rounded 1c', sans-serif; }

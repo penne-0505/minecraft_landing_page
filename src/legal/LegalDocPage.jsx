@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { legalDocs, legalDocList } from "./config";
 import Footer from "../components/layout/Footer";
+import Seo from "../components/Seo";
 
 const slugify = (text) =>
   text
@@ -120,6 +121,12 @@ const LegalDocPage = ({ docKey }) => {
 
   return (
     <div className="min-h-screen bg-[#f0f9ff] text-[#1e293b] font-sans">
+      <Seo
+        title={doc.title}
+        description={doc.description}
+        path={doc.path}
+        type="article"
+      />
       <main className="container mx-auto px-4 md:px-6 py-14 max-w-5xl">
         <div className="flex items-center justify-start gap-3 mb-5">
           <a
