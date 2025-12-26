@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { captureError } from "../analytics";
+import { consumeDiscordOAuthState } from "../utils/discordAuth";
 
 const AuthCallback = () => {
   const location = useLocation();
@@ -15,12 +16,14 @@ const AuthCallback = () => {
       return;
     }
 
-    let targetPath = "/membership";
-    if (state && state.startsWith("/")) {
-      targetPath = state;
-    } else if (state) {
+    const parsedState = consumeDiscordOAuthState(state);
+    if (!parsedState?.returnTo || !parsedState.returnTo.startsWith("/")) {
       captureError(new Error("Invalid OAuth state"), { stateValue: state });
+      window.location.replace("/membership?auth=invalid");
+      return;
     }
+
+    const targetPath = parsedState.returnTo;
 
     const targetUrl = new URL(targetPath, window.location.origin);
     targetUrl.searchParams.set("code", code);

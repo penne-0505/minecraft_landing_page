@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "./telemetry";
+import { requireSession } from "./auth";
 
 /**
  * Create Stripe Billing Portal session for the logged-in Discord user.
@@ -17,23 +18,16 @@ export async function onRequest(context) {
     return new Response("Missing Stripe env", { status: 500 });
   }
 
-  let discordUserId;
-  try {
-    const body = await request.json();
-    discordUserId = body.discord_user_id;
-  } catch (_) {
-    return new Response("Invalid JSON", { status: 400 });
-  }
-
-  if (!discordUserId) {
-    return new Response("Missing discord_user_id", { status: 400 });
+  const session = await requireSession(request, env);
+  if (!session.ok) {
+    return new Response(session.message, { status: session.status });
   }
 
   // Use account default API version; avoid pinning to unavailable future versions.
   const stripe = new Stripe(STRIPE_SECRET_KEY);
 
   try {
-    const customer = await findCustomerByDiscordId(stripe, discordUserId);
+    const customer = await findCustomerByDiscordId(stripe, session.userId);
     if (!customer) {
       return new Response("Customer not found", { status: 404 });
     }

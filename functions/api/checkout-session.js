@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "../telemetry";
+import { requireSession } from "../auth";
 
 const SUBSCRIPTION_OK_STATUSES = new Set(["trialing", "active", "past_due"]);
 
@@ -19,6 +20,11 @@ export async function onRequest(context) {
   const sessionId = url.searchParams.get("session_id");
   if (!sessionId) {
     return new Response("Missing session_id", { status: 400 });
+  }
+
+  const sessionAuth = await requireSession(request, env);
+  if (!sessionAuth.ok) {
+    return new Response(sessionAuth.message, { status: sessionAuth.status });
   }
 
   // Use account default API version; avoid pinning to unavailable future versions.
@@ -61,6 +67,11 @@ export async function onRequest(context) {
 
     const lineItem = session.line_items?.data?.[0];
     const priceType = session.metadata?.price_type || null;
+    const ownerId = await resolveOwnerDiscordId(session, stripe);
+
+    if (!ownerId || ownerId !== sessionAuth.userId) {
+      return new Response("Forbidden", { status: 403 });
+    }
 
     trackEvent(
       "checkout_session_fetch_success",
@@ -99,4 +110,19 @@ export async function onRequest(context) {
     captureError(err, { stage: "checkout_session_fetch" }, env);
     return new Response("Failed to load checkout session", { status: 500 });
   }
+}
+
+async function resolveOwnerDiscordId(session, stripe) {
+  if (session?.metadata?.discord_user_id) {
+    return session.metadata.discord_user_id;
+  }
+
+  if (session?.customer) {
+    const customer = await stripe.customers.retrieve(session.customer);
+    if (!customer.deleted && customer.metadata?.discord_user_id) {
+      return customer.metadata.discord_user_id;
+    }
+  }
+
+  return null;
 }

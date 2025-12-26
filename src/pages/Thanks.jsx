@@ -111,10 +111,14 @@ export default function Thanks() {
         setLoading(true);
         const res = await fetch(
           `/api/checkout-session?session_id=${encodeURIComponent(sessionId)}`,
-          { signal: controller.signal }
+          { signal: controller.signal, credentials: "include" }
         );
         if (!res.ok) {
           const text = await res.text();
+          if (res.status === 401) {
+            setError("ログインが必要です。");
+            return;
+          }
           throw new Error(text || "決済データの取得に失敗しました。");
         }
         const data = await res.json();

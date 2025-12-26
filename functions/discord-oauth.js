@@ -3,6 +3,7 @@
  * Expects POST JSON: { code }
  */
 import { trackEvent, captureError } from "./telemetry";
+import { issueSessionCookie } from "./auth";
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -62,7 +63,6 @@ export async function onRequest(context) {
 
   const tokenJson = await tokenRes.json();
   const accessToken = tokenJson.access_token;
-  const refreshToken = tokenJson.refresh_token;
 
   // 2) Fetch user info
   const userRes = await fetch("https://discord.com/api/users/@me", {
@@ -98,6 +98,21 @@ export async function onRequest(context) {
 
   trackEvent("discord_oauth_success", { userId: user.id }, env);
 
+  let sessionCookie;
+  try {
+    const session = await issueSessionCookie(user.id, request, env);
+    sessionCookie = session.cookie;
+  } catch (err) {
+    captureError(err, { stage: "session_cookie_issue" }, env);
+    return new Response("Session issue failed", { status: 500 });
+  }
+
+  const headers = new Headers({
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store",
+  });
+  headers.append("Set-Cookie", sessionCookie);
+
   return new Response(
     JSON.stringify({
       user: {
@@ -106,15 +121,10 @@ export async function onRequest(context) {
         discriminator: user.discriminator,
         avatar: user.avatar,
       },
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: tokenJson.expires_in,
-      scope: tokenJson.scope,
-      token_type: tokenJson.token_type,
     }),
     {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers,
     }
   );
 }

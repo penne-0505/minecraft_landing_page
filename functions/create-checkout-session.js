@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "./telemetry";
+import { requireSession } from "./auth";
 
 /**
  * Create Stripe Checkout Session
@@ -37,17 +38,14 @@ export async function onRequest(context) {
 		return new Response("Invalid JSON", { status: 400 });
 	}
 
-	const {
-		priceType,
-		discord_user_id,
-		avatar_url,
-		consent_roles,
-		consent_terms,
-	} = body || {};
-	if (!priceType || !discord_user_id) {
-		return new Response("Missing priceType or discord_user_id", {
-			status: 400,
-		});
+	const session = await requireSession(request, env);
+	if (!session.ok) {
+		return new Response(session.message, { status: session.status });
+	}
+
+	const { priceType, avatar_url, consent_roles, consent_terms } = body || {};
+	if (!priceType) {
+		return new Response("Missing priceType", { status: 400 });
 	}
 
 	const priceMap = {
@@ -69,7 +67,7 @@ export async function onRequest(context) {
 	try {
 		const customer = await findOrCreateCustomer(
 			stripe,
-			discord_user_id,
+			session.userId,
 			avatar_url
 		);
 
@@ -80,7 +78,7 @@ export async function onRequest(context) {
 			success_url: `${APP_BASE_URL}/thanks?session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${APP_BASE_URL}/membership?checkout=cancel`,
 			metadata: {
-				discord_user_id,
+				discord_user_id: session.userId,
 				price_type: priceType,
 				avatar_url: avatar_url || "",
 				consent_roles: String(consent_roles),
@@ -89,14 +87,14 @@ export async function onRequest(context) {
 			subscription_data:
 				mode === "subscription"
 					? {
-							metadata: { discord_user_id, price_type: priceType },
+							metadata: { discord_user_id: session.userId, price_type: priceType },
 					  }
 					: undefined,
 			payment_intent_data:
 				mode === "payment"
-					? { metadata: { discord_user_id, price_type: priceType } }
+					? { metadata: { discord_user_id: session.userId, price_type: priceType } }
 					: undefined,
-			client_reference_id: discord_user_id,
+			client_reference_id: session.userId,
 		});
 
 		trackEvent(

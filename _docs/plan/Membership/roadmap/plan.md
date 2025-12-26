@@ -3,7 +3,7 @@ title: Membership Pages Roadmap
 status: proposed
 draft_status: n/a
 created_at: 2025-12-07
-updated_at: 2025-12-21
+updated_at: 2025-12-26
 references: []
 related_issues: []
 related_prs: []
@@ -33,7 +33,7 @@ related_prs: []
 - Monitoring: GA4/Sentry は後日導入。Hook ポイントと env プレースホルダだけ先に用意する。
 
 ## Requirements & Constraints
-- 環境変数例（Cloudflare Pages Functions）: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_REDIRECT_URI`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `DISCORD_ROLE_MEMBER_ID`, `STRIPE_PRICE_*`.
+- 環境変数例（Cloudflare Pages Functions）: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_REDIRECT_URI`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `DISCORD_ROLE_MEMBER_ID`, `STRIPE_PRICE_*`, `AUTH_TOKEN_SECRET`, `AUTH_TOKEN_TTL_SECONDS`.
 - セキュリティ: Webhook 署名検証必須。Bot API は認可トークンを要求し、IP allowlist も検討。
 - UX: モバイル優先（ただし PC 同等品質）。CTA は Discord 参加、補助導線としてメンバーシップページ。
 - 法的文書: `src/legal/content/` を正として管理し、フロントから参照する。開発者向けの参照コピーは `_docs/guide/legal/` に保持する。

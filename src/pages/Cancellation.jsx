@@ -65,14 +65,16 @@ export default function CancellationSuccessPage() {
     (async () => {
       try {
         setStatus("loading");
-        const res = await fetch(
-          `/api/subscription-status?discord_user_id=${encodeURIComponent(
-            user.id
-          )}`,
-          { signal: controller.signal }
-        );
+        const res = await fetch("/api/subscription-status", {
+          signal: controller.signal,
+          credentials: "include",
+        });
         if (!res.ok) {
           const text = await res.text();
+          if (res.status === 401) {
+            setStatus("not-logged-in");
+            return;
+          }
           throw new Error(text || "Failed to load subscription status");
         }
         const data = await res.json();

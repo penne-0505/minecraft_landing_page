@@ -37,6 +37,34 @@ npm -v    # 10 以上になっていること
 npm install
 ```
 
+### 環境変数（ローカル/デプロイ）
+ローカルで決済・認証フローを検証する場合は、Vite 用の `.env.local` と Cloudflare Pages Functions の環境変数を用意してください。
+Secrets はリポジトリにコミットせず、Cloudflare の環境変数で管理します。
+
+#### Pages Functions（必須）
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `DISCORD_CLIENT_ID`
+- `DISCORD_CLIENT_SECRET`
+- `DISCORD_REDIRECT_URI`
+- `DISCORD_BOT_TOKEN`
+- `DISCORD_GUILD_ID`
+- `DISCORD_ROLE_MEMBER_ID`
+- `STRIPE_PRICE_ONE_MONTH`
+- `STRIPE_PRICE_SUB_MONTHLY`
+- `STRIPE_PRICE_SUB_YEARLY`
+- `AUTH_TOKEN_SECRET`
+
+#### Pages Functions（任意）
+- `AUTH_TOKEN_TTL_SECONDS`
+
+#### Pages（フロント）
+- `VITE_APP_BASE_URL`
+- `VITE_DISCORD_CLIENT_ID`
+- `VITE_DISCORD_REDIRECT_URI`
+- `VITE_SENTRY_DSN`（任意）
+- `VITE_GA4_MEASUREMENT_ID`（任意）
+
 ### よく使うスクリプト
 ```bash
 npm run dev      # 開発サーバー起動（デフォルト: http://localhost:5173）

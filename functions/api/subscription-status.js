@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "../telemetry";
+import { requireSession } from "../auth";
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -13,10 +14,9 @@ export async function onRequest(context) {
     return new Response("Missing STRIPE_SECRET_KEY", { status: 500 });
   }
 
-  const url = new URL(request.url);
-  const discordUserId = url.searchParams.get("discord_user_id");
-  if (!discordUserId) {
-    return new Response("Missing discord_user_id", { status: 400 });
+  const session = await requireSession(request, env);
+  if (!session.ok) {
+    return new Response(session.message, { status: session.status });
   }
 
   // Use account default API version; avoid pinning to unavailable future versions.
@@ -24,7 +24,7 @@ export async function onRequest(context) {
 
   try {
     const result = await stripe.subscriptions.search({
-      query: `metadata['discord_user_id']:'${discordUserId}'`,
+      query: `metadata['discord_user_id']:'${session.userId}'`,
       limit: 10,
       expand: ["data.items.data.price"],
     });

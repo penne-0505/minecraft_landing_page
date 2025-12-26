@@ -14,6 +14,7 @@ import { beginDiscordLogin } from "../utils/discordAuth";
 import PricingComponent from "../components/ui/PricingComponent";
 import Divider from "../components/ui/Divider";
 import Seo from "../components/Seo";
+import { createDiscordOAuthState } from "../utils/discordAuth";
 
 export const CheckboxCard = ({ 
   checked, 
@@ -114,6 +115,7 @@ export default function Contract() {
         const res = await fetch("/discord-oauth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ code }),
         });
         if (!res.ok) {
@@ -150,13 +152,14 @@ export default function Contract() {
     trackEvent("login_start", { provider: "discord", context: "contract" });
     setOauthRedirecting(true);
     const returnTo = `${window.location.pathname}${window.location.search}`;
+    const state = createDiscordOAuthState(returnTo || "/membership");
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_DISCORD_CLIENT_ID || "",
       response_type: "code",
       scope: "identify guilds.join",
       redirect_uri: redirectUriClient,
       prompt: "consent",
-      state: returnTo || "/membership",
+      state,
     });
     window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
   };
@@ -189,9 +192,9 @@ export default function Contract() {
       const res = await fetch("/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           priceType: planParam,
-          discord_user_id: user.id,
           avatar_url: user.avatar || null,
           consent_roles: agreements.discordRole,
           consent_terms: agreements.terms,
@@ -200,6 +203,16 @@ export default function Contract() {
 
       if (!res.ok) {
         const text = await res.text();
+        if (res.status === 401) {
+          localStorage.removeItem("discord_user");
+          setUser(null);
+          setError("認証が切れました。メンバーシップページへ戻ります。");
+          setTimeout(() => {
+            window.location.href = "/membership";
+          }, 1800);
+          setIsLoading(false);
+          return;
+        }
         captureError(new Error("Checkout create failed"), { priceType: planParam, text });
         setError("決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。");
         setIsLoading(false);
