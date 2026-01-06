@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { trackPageView } from "./analytics";
 
 const Membership = lazy(() => import("./pages/Membership.jsx"));
-const Placeholder = lazy(() => import("./pages/Placeholder.jsx"));
 const JoinLanding = lazy(() => import("./pages/JoinLanding.jsx"));
 const Contract = lazy(() => import("./pages/Contract.jsx"));
 const Help = lazy(() => import("./pages/Help.jsx"));

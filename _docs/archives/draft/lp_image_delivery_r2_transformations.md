@@ -48,7 +48,7 @@ related_prs: []
 - 外部依存（Imgur）を廃止し、R2 配信 URL に置換。
 
 ## Code Touch Points (予定)
-- `src/pages/Join.jsx`: IMAGES 定義と `<img>` / `PhotoFrame` の src を R2 生成 URL に変更。
+- `src/pages/JoinLanding.jsx`: IMAGES 定義と `<img>` / `PhotoFrame` の src を R2 生成 URL に変更。
 - `src/pages/Home.jsx`: heroImages を R2 生成 URL に変更。
 - `src/components/layout/Header.jsx` / `src/pages/Contract.jsx`:
   - 影響範囲は最小化し、ユーザー/外部由来アバターは現状維持。

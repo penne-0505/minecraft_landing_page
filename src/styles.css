@@ -2,48 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-  /* Design tokens (from guide/design/design_tokens.md) */
-  --color-bg: #f0f9ff;
-  --color-surface: #ffffff;
-  --color-text: #1e293b;
-  --color-accent: #5fbb4e;
-  --color-accent-strong: #4a9a3d;
-  --color-cta: #5865f2;
-  --color-cta-shadow: #4752c4;
-  --color-border: #e2e8f0;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 15px -3px rgba(50, 60, 90, 0.05);
-  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 200ms;
-  --duration-base: 300ms;
+@layer base {
+  :root {
+    /* Fallback/Legacy variables mapping to new tokens */
+    --color-bg: theme('colors.neutral.100');
+    --color-surface: #ffffff;
+    --color-text: theme('colors.neutral.800');
+    --color-accent: theme('colors.brand.400');
+    --color-accent-strong: theme('colors.brand.500');
+    --color-cta: theme('colors.discord.base');
+    --color-cta-shadow: theme('colors.discord.dark');
+    --color-border: theme('colors.neutral.200');
+    
+    --radius-sm: theme('borderRadius.sm');
+    --radius-md: theme('borderRadius.md');
+    --radius-lg: theme('borderRadius.lg');
+    
+    --shadow-card: theme('boxShadow.soft');
+    
+    --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+    --duration-fast: 200ms;
+    --duration-base: 300ms;
+  }
+
+  body {
+    @apply bg-neutral-100 text-neutral-800 font-body antialiased;
+    /* M PLUS Rounded 1c: Proportional Metrics for beautiful kerning */
+    font-feature-settings: "palt";
+  }
+
+  /* Headings Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-neutral-900;
+    /* Outfit: Simple 'a' (cv01), Proportional Numbers (pnum) */
+    font-feature-settings: "cv01", "pnum";
+  }
+  
+  /* Applying OpenType features to classes that use the display font */
+  .font-display, .brand-font {
+    font-feature-settings: "cv01", "pnum";
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: "M PLUS Rounded 1c", "Outfit", system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.font-display,
-.brand-font {
-  font-family: "Outfit", sans-serif;
-}
-
-.font-body {
-  font-family: "M PLUS Rounded 1c", sans-serif;
-}
-
-#root {
-  min-height: 100vh;
-}
-
+/* Glass effect utility */
 .glass-header {
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(12px);
