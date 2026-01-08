@@ -32,14 +32,14 @@ export async function onRequest(context) {
       return new Response("Customer not found", { status: 404 });
     }
 
-    const session = await stripe.billingPortal.sessions.create({
+    const portalSession = await stripe.billingPortal.sessions.create({
       customer: customer.id,
       return_url: `${APP_BASE_URL}/?portal=return`,
     });
 
     trackEvent("portal_session_created", { customerId: customer.id }, env);
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: portalSession.url }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

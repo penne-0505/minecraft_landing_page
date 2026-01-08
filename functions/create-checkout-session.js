@@ -67,7 +67,7 @@ export async function onRequest(context) {
   try {
     const customer = await findOrCreateCustomer(stripe, session.userId, avatar_url);
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       mode,
       customer: customer.id,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -95,7 +95,7 @@ export async function onRequest(context) {
 
     trackEvent("checkout_session_created", { priceType, mode, customerId: customer.id }, env);
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: checkoutSession.url }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

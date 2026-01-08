@@ -1,7 +1,7 @@
 # Project Task Management Rules
 
 ## 0. System Metadata
-- **Current Max ID**: `Next ID No: 30` (※タスク追加時にインクリメント必須)
+- **Current Max ID**: `Next ID No: 31` (※タスク追加時にインクリメント必須)
 - **ID Source of Truth**: このファイルの `Next ID No` 行が、全プロジェクトにおける唯一のID発番元である。
 
 ## 1. Task Lifecycle (State Machine)
@@ -180,27 +180,26 @@ ID生成およびタイトルのプレフィックスには以下のみを使用
 --- 
 
 ## Inbox
-- テスト拡充
 - ドキュメント更新
 - ヘルプページ作成
 
 ---
 
 ## Backlog
-
-- **Title**: [Enhance] JoinLanding scroll/load animations parity
-- **ID**: UI-Enhance-29
-- **Priority**: P2
+- **Title**: [Test] Backend Functionsのテスト拡充
+- **ID**: DevOps-Test-30
+- **Priority**: P1
 - **Size**: M
-- **Area**: UI
+- **Area**: DevOps
 - **Dependencies**: []
-- **Goal**: JoinLandingでスクロール/読み込みに応じたアニメーションが適用され、Membershipと同等の視覚的な動きが提供される。
+- **Goal**: Pages Functionsの主要フロー（Stripe/Discord認証/サポーター管理/telemetry）を自動テストで再現し、回帰の検知ができる状態にする。
 - **Steps**:
-  1. [ ] Planの"Scope"に沿ってJoinLandingの対象セクションと適用パターンを確定する
-  2. [ ] Planの"Tasks"に従ってmotion/viewport設定とアニメーション定義を追加する
-  3. [ ] Planの"Test Plan"に従い表示確認を行う
-- **Description**: JoinLandingにMembership相当の読み込み/スクロールアニメーションを導入し、体験の一貫性を高める。
-- **Plan**: `_docs/plan/UI/join-landing-animations/plan.md`
+  1. [ ] 既存のテスト/実行手順（`package.json` / `functions/`）を棚卸しする
+  2. [ ] Functionsごとの重要シナリオとリスク（決済/認証/権限）を整理する
+  3. [ ] `_docs/plan/DevOps/backend-test-expansion/plan.md` にテスト戦略・対象範囲・優先度を記載する
+  4. [ ] Planに基づいてテスト実装・CI連携の方針を定義する
+- **Description**: Cloudflare Pages Functionsのバックエンドに対して、回帰検知のためのテスト範囲と実装方針を拡充する。
+- **Plan**: `_docs/plan/DevOps/backend-test-expansion/plan.md`
 
 ---
 
