@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   MessageCircle,
   Map,
@@ -218,6 +219,16 @@ const PhotoFrame = ({
 
 const Hero = () => {
   const [activeHeroPhoto, setActiveHeroPhoto] = useState(null);
+  const reduceMotion = useReducedMotion();
+  const heroFadeUp = reduceMotion
+    ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 24 },
+        animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+      };
+  const heroStagger = reduceMotion
+    ? { animate: { transition: { staggerChildren: 0 } } }
+    : { animate: { transition: { staggerChildren: 0.16, delayChildren: 0.1 } } };
 
   const handleHeroPointerDown = (id) => (event) => {
     if (event.pointerType === "mouse") {
@@ -243,11 +254,19 @@ const Hero = () => {
       </div>
 
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 relative z-10 grid md:grid-cols-12 gap-12 items-center">
-        <div className="md:col-span-6 text-center md:text-left pt-4 md:pt-0">
+        <motion.div
+          className="md:col-span-6 text-center md:text-left pt-4 md:pt-0"
+          initial="initial"
+          animate="animate"
+          variants={heroStagger}
+        >
           <h3 className="text-xs font-bold tracking-[0.2em] translate-x-[0.13em] text-[#5fbb4e] uppercase mt-3 mb-2">
             Since 2019
           </h3>
-          <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#1e293b] tracking-tight mt-3 mb-4 md:mb-6">
+          <motion.h1
+            className="font-display font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#1e293b] tracking-tight mt-3 mb-4 md:mb-6"
+            variants={heroFadeUp}
+          >
             <span className="block md:-translate-x-[0.1em]">あなたらしく</span>
             <span className="block md:-translate-x-[0.06em] translate-x-[0.33em]">
               遊べる場所が、
@@ -255,8 +274,11 @@ const Hero = () => {
             <span className="block text-[#5fbb4e] md:-translate-x-[0.115em] translate-x-[0.33em]">
               ここにある。
             </span>
-          </h1>
-          <p className="font-normal text-[#64748b] text-base md:text-xl leading-relaxed max-w-lg mx-auto md:mx-0 mb-6 md:mb-8">
+          </motion.h1>
+          <motion.p
+            className="font-normal text-[#64748b] text-base md:text-xl leading-relaxed max-w-lg mx-auto md:mx-0 mb-6 md:mb-8"
+            variants={heroFadeUp}
+          >
             建築に没頭する人、冒険を楽しむ人、
             <br />
             雑談で夜を過ごす人。
@@ -264,9 +286,12 @@ const Hero = () => {
             200名が集まるこのサーバーでは、
             <br />
             建築 どんな遊び方も、自然に共存しています。
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start mt-4">
+          <motion.div
+            className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start mt-4"
+            variants={heroFadeUp}
+          >
             <Button
               variant="primary"
               className="w-full sm:w-auto px-8 py-4 text-lg shadow-lg hover:shadow-xl"
@@ -282,8 +307,8 @@ const Hero = () => {
             >
               ギャラリーを見る <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         <div className="md:col-span-6 relative h-[360px] md:h-[500px] w-full perspective-1000 mt-8 md:mt-0">
           <div
@@ -291,9 +316,19 @@ const Hero = () => {
             onPointerDown={handleHeroBackgroundPointerDown}
           >
             {/* Main Image */}
-            <div
-              className={`absolute ${getHeroZIndex("main", "z-30")} transform -rotate-2 hover:rotate-0 transition-transform duration-500 w-64 md:w-80`}
+            <motion.div
+              className={`absolute ${getHeroZIndex("main", "z-30")} w-64 md:w-80`}
               onPointerDown={handleHeroPointerDown("main")}
+              initial={
+                reduceMotion ? { opacity: 1, y: 0, rotate: -2 } : { opacity: 0, y: 20, rotate: -2 }
+              }
+              animate={{ opacity: 1, y: 0, rotate: -2 }}
+              whileHover={reduceMotion ? undefined : { rotate: 0 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.7,
+                ease: "easeOut",
+                delay: reduceMotion ? 0 : 0.1,
+              }}
             >
               <PhotoFrame
                 caption="ダミーテキスト"
@@ -304,37 +339,59 @@ const Hero = () => {
                 rotate="rotate-0"
                 className={activeHeroPhoto === "main" ? "scale-105 !shadow-2xl" : ""}
               />
-            </div>
+            </motion.div>
             {/* Right Floater */}
-            <div
-              className={`absolute top-0 right-0 md:-right-4 ${getHeroZIndex("right", "z-20")} transform rotate-6 w-36 md:w-56 animate-float-delayed`}
+            <motion.div
+              className={`absolute top-0 right-0 md:-right-4 ${getHeroZIndex("right", "z-20")} w-36 md:w-56`}
               onPointerDown={handleHeroPointerDown("right")}
+              initial={
+                reduceMotion ? { opacity: 1, y: 0, rotate: 6 } : { opacity: 0, y: 24, rotate: 6 }
+              }
+              animate={{ opacity: 1, y: 0, rotate: 6 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.7,
+                ease: "easeOut",
+                delay: reduceMotion ? 0 : 0.1,
+              }}
             >
-              <PhotoFrame
-                caption="ダミーテキスト"
-                image={joinImages.heroRight}
-                sizes={IMAGE_SIZES.heroRight}
-                loading="lazy"
-                fetchPriority="low"
-                rotate="rotate-3"
-                className={activeHeroPhoto === "right" ? "scale-105 !shadow-2xl" : ""}
-              />
-            </div>
+              <div className="animate-float-y-delayed">
+                <PhotoFrame
+                  caption="ダミーテキスト"
+                  image={joinImages.heroRight}
+                  sizes={IMAGE_SIZES.heroRight}
+                  loading="lazy"
+                  fetchPriority="low"
+                  rotate="rotate-3"
+                  className={activeHeroPhoto === "right" ? "scale-105 !shadow-2xl" : ""}
+                />
+              </div>
+            </motion.div>
             {/* Left Floater */}
-            <div
-              className={`absolute bottom-4 left-0 md:-left-8 ${getHeroZIndex("left", "z-20")} transform -rotate-6 w-40 md:w-60 animate-float`}
+            <motion.div
+              className={`absolute bottom-4 left-0 md:-left-8 ${getHeroZIndex("left", "z-20")} w-40 md:w-60`}
               onPointerDown={handleHeroPointerDown("left")}
+              initial={
+                reduceMotion ? { opacity: 1, y: 0, rotate: -6 } : { opacity: 0, y: 24, rotate: -6 }
+              }
+              animate={{ opacity: 1, y: 0, rotate: -6 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.7,
+                ease: "easeOut",
+                delay: reduceMotion ? 0 : 0.1,
+              }}
             >
-              <PhotoFrame
-                caption="ダミーテキスト"
-                image={joinImages.heroLeft}
-                sizes={IMAGE_SIZES.heroLeft}
-                loading="lazy"
-                fetchPriority="low"
-                rotate="-rotate-3"
-                className={activeHeroPhoto === "left" ? "scale-105 !shadow-2xl" : ""}
-              />
-            </div>
+              <div className="animate-float-y">
+                <PhotoFrame
+                  caption="ダミーテキスト"
+                  image={joinImages.heroLeft}
+                  sizes={IMAGE_SIZES.heroLeft}
+                  loading="lazy"
+                  fetchPriority="low"
+                  rotate="-rotate-3"
+                  className={activeHeroPhoto === "left" ? "scale-105 !shadow-2xl" : ""}
+                />
+              </div>
+            </motion.div>
 
             {/* Decorative Icons - Hidden on very small screens to reduce clutter */}
             {/* <div className="hidden sm:block absolute top-10 left-10 text-[#5fbb4e] opacity-20 transform -rotate-12 animate-pulse">
@@ -351,8 +408,31 @@ const Hero = () => {
 };
 
 const MemoryLane = () => {
+  const reduceMotion = useReducedMotion();
+  const revealProps = reduceMotion
+    ? { initial: false, whileInView: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 24 },
+        whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+      };
+  const containerProps = reduceMotion
+    ? { initial: false, whileInView: { opacity: 1 } }
+    : {
+        initial: { opacity: 0, y: 20 },
+        whileInView: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.7, ease: "easeOut", staggerChildren: 0.1 },
+        },
+      };
+
   return (
-    <section id="memories" className="py-20 bg-white relative overflow-hidden">
+    <motion.section
+      id="memories"
+      className="py-20 bg-white relative overflow-hidden"
+      viewport={{ once: true, amount: 0.2 }}
+      {...containerProps}
+    >
       {/* Background Atmosphere */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[8%] -right-[12%] w-[20rem] md:w-[36rem] h-[20rem] md:h-[36rem] bg-[#fff2e1] rounded-full mix-blend-multiply filter blur-3xl opacity-55 animate-blob" />
@@ -372,21 +452,21 @@ const MemoryLane = () => {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex justify-between items-end mb-16">
-          <div>
+          <motion.div {...revealProps}>
             <h3 className="text-xs font-bold tracking-[0.2em] text-[#5fbb4e] uppercase mt-3 mb-2">
               Gallery
             </h3>
             <h2 className="text-3xl md:text-4xl font-display font-black text-[#1e293b] mt-3">
               サーバーの風景
             </h2>
-          </div>
+          </motion.div>
         </div>
 
         {/* Masonry-style Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* Col 1 */}
           <div className="space-y-8 md:space-y-12 mt-0 md:mt-12">
-            <div className="group cursor-pointer">
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/4]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -399,8 +479,11 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]">
+            </motion.div>
+            <motion.div
+              className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]"
+              {...revealProps}
+            >
               <Quote className="w-6 h-6 text-[#5fbb4e] mb-4 opacity-50" />
               <p className="font-normal text-lg leading-relaxed text-[#1e293b] mb-4">
                 「またまたあり事はたった大変と云っですて、こういうがたをしかいうたでって一種を云えてしまったた。」
@@ -411,8 +494,8 @@ const MemoryLane = () => {
                 </div>
                 <span className="text-xs font-bold text-[#64748b]">ユーザー</span>
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[4/3]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -425,8 +508,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/5]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -439,8 +522,11 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]">
+            </motion.div>
+            <motion.div
+              className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]"
+              {...revealProps}
+            >
               <Quote className="w-6 h-6 text-[#5fbb4e] mb-4 opacity-50" />
               <p className="font-normal text-lg leading-relaxed text-[#1e293b] mb-4">
                 「権力からかつ張さんがそうしてされど訳ありあるん。嘉納さんはぴたり自分を考えでありなのなあるん。」
@@ -451,12 +537,12 @@ const MemoryLane = () => {
                 </div>
                 <span className="text-xs font-bold text-[#64748b]">ユーザー</span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Col 2 */}
           <div className="space-y-8 md:space-y-12">
-            <div className="group cursor-pointer">
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[4/3]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -469,8 +555,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-square">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -483,8 +569,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-square">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -497,8 +583,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/4]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -511,8 +597,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/4]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -525,12 +611,12 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Col 3 */}
           <div className="space-y-8 md:space-y-12 mt-0 md:mt-24">
-            <div className="group cursor-pointer">
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-square">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -543,8 +629,8 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/5]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -557,8 +643,11 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
-            <div className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]">
+            </motion.div>
+            <motion.div
+              className="bg-white p-8 rounded-sm shadow-sm border border-[#e2e8f0]"
+              {...revealProps}
+            >
               <Quote className="w-6 h-6 text-[#5fbb4e] mb-4 opacity-50" />
               <p className="font-normal text-lg leading-relaxed text-[#1e293b] mb-4">
                 「さて大体ちょっと他人が落ちつけていたたば、いにしえのあり様はこれ様々、妨害がけっして吹聴のようです。」
@@ -569,8 +658,8 @@ const MemoryLane = () => {
                 </div>
                 <span className="text-xs font-bold text-[#64748b]">ユーザー</span>
               </div>
-            </div>
-            <div className="group cursor-pointer">
+            </motion.div>
+            <motion.div className="group cursor-pointer" {...revealProps}>
               <div className="relative overflow-hidden rounded-sm shadow-xl aspect-[3/4]">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                 <img
@@ -583,11 +672,11 @@ const MemoryLane = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
@@ -617,11 +706,23 @@ const StoryCard = ({ author, text, avatarColor }) => (
 );
 
 const Stories = () => {
+  const reduceMotion = useReducedMotion();
+  const revealProps = reduceMotion
+    ? { initial: false, whileInView: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 20 },
+        whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+      };
+
   return (
-    <section id="reviews" className="py-20 md:py-24 bg-[#f8fafc] border-t border-[#e2e8f0]">
+    <motion.section
+      id="reviews"
+      className="py-20 md:py-24 bg-[#f8fafc] border-t border-[#e2e8f0]"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       <div className="max-w-screen-xl mx-auto px-4 md:px-8">
         <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start mb-8 md:mb-16">
-          <div>
+          <motion.div {...revealProps}>
             <h3 className="text-xs font-bold tracking-[0.2em] text-[#5fbb4e] uppercase mt-3 mb-2">
               Player Stories
             </h3>
@@ -635,9 +736,9 @@ const Stories = () => {
               <br />
               多くの繋がりが生まれています。
             </p>
-          </div>
+          </motion.div>
           {/* Mobile: Vertical Stack, Desktop: Staggered Grid */}
-          <div className="flex flex-col gap-6 font-normal">
+          <motion.div className="flex flex-col gap-6 font-normal" {...revealProps}>
             <StoryCard
               author="ユーザーA"
               avatarColor="bg-blue-400"
@@ -650,18 +751,30 @@ const Stories = () => {
                 text="いわゆる反駁はどんな手本の目標というますはませ、彼らかの人人間の例というなたくないと内談ありているでて、はなはだ何は漠然たる上岡田さんとしてでたらめですのをできるた。"
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
 // --- Refined Feature Section (METAPHOR FOCUSED) ---
 
 const RefinedFeatures = () => {
+  const reduceMotion = useReducedMotion();
+  const revealProps = reduceMotion
+    ? { initial: false, whileInView: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 24 },
+        whileInView: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+      };
+
   return (
-    <section id="features" className="py-20 md:py-32 bg-white overflow-hidden relative">
+    <motion.section
+      id="features"
+      className="py-20 md:py-32 bg-white overflow-hidden relative"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       {/* Background Atmosphere */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[10%] -left-[10%] w-[20rem] md:w-[40rem] h-[20rem] md:h-[40rem] bg-green-50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
@@ -673,7 +786,7 @@ const RefinedFeatures = () => {
 
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 relative z-10 space-y-24 md:space-y-32">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto">
+        <motion.div className="text-center max-w-3xl mx-auto" {...revealProps}>
           <h3 className="text-xs font-bold tracking-[0.2em] text-[#5fbb4e] uppercase mt-3 mb-2">
             Why Choose Us?
           </h3>
@@ -691,11 +804,11 @@ const RefinedFeatures = () => {
             <br />
             私たちが用意するのは、選択肢と安心できる環境だけです。
           </p>
-        </div>
+        </motion.div>
 
         {/* --- METAPHOR 1: The "To-Do List" (Freedom) --- */}
         <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
-          <div className="relative perspective-1000 px-2 md:px-0">
+          <motion.div className="relative perspective-1000 px-2 md:px-0" {...revealProps}>
             {/* The Clipboard / Notepad Visual */}
             <div className="absolute inset-0 bg-slate-200 rounded-[2rem] transform rotate-2 translate-y-2"></div>
             <div className="relative bg-[#fffbeb] border border-slate-200 p-6 md:p-8 rounded-[2rem] shadow-xl overflow-hidden">
@@ -764,9 +877,9 @@ const RefinedFeatures = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div {...revealProps}>
             <h3 className="font-display font-black text-3xl md:text-4xl text-[#1e293b] mt-3 -translate-x-[0.04em]">
               日常の合間に、
               <br />
@@ -782,13 +895,13 @@ const RefinedFeatures = () => {
               <br />
               戻ってきたときに、自然に溶け込める場所です。
             </p>
-          </div>
+          </motion.div>
           <div className="md:hidden order-3 col-span-full h-px w-full bg-gradient-to-r from-transparent via-slate-200/80 to-transparent mt-10" />
         </div>
 
         {/* --- METAPHOR 2: The "Clan Banners" (Belonging) --- */}
         <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
-          <div className="order-2 md:order-1">
+          <motion.div className="order-2 md:order-1" {...revealProps}>
             <h3 className="font-display font-black text-3xl md:text-4xl text-[#1e293b] mt-3 -translate-x-[0.06em]">
               グループで、
               <br />
@@ -804,9 +917,12 @@ const RefinedFeatures = () => {
               <br />
               同じ「好き」を持つ人たちが、自然に集まっています。
             </p>
-          </div>
+          </motion.div>
 
-          <div className="relative order-1 md:order-2 h-[320px] md:h-[400px] flex flex-col justify-start items-center pt-8 md:pt-10 perspective-1000">
+          <motion.div
+            className="relative order-1 md:order-2 h-[320px] md:h-[400px] flex flex-col justify-start items-center pt-8 md:pt-10 perspective-1000"
+            {...revealProps}
+          >
             {/* The "Rope" holding banners */}
             <div className="absolute top-10 md:top-12 left-4 md:left-0 right-4 md:right-0 h-1 bg-slate-300 rounded-full transform -rotate-2 z-0"></div>
 
@@ -855,12 +971,12 @@ const RefinedFeatures = () => {
             <div className="absolute bottom-10 right-10 md:right-20 text-indigo-200 transform rotate-12">
               <Crown size={48} className="md:w-16 md:h-16" opacity={0.2} />
             </div>
-          </div>
+          </motion.div>
           <div className="md:hidden order-3 col-span-full h-px w-full bg-gradient-to-r from-transparent via-slate-200/80 to-transparent mt-10" />
         </div>
 
         {/* --- METAPHOR 3: "Support" --- */}
-        <div className="grid grid-cols-1">
+        <motion.div className="grid grid-cols-1" {...revealProps}>
           <Card className="bg-gradient-to-br from-white to-blue-50 !border-0 p-6 md:p-10 relative overflow-hidden transition-none hover:translate-y-0">
             <div className="absolute inset-0 rounded-3xl border-2 border-blue-200 opacity-0" />
             <div className="relative z-10 flex flex-col md:flex-row items-start gap-6 h-full">
@@ -877,7 +993,7 @@ const RefinedFeatures = () => {
               </div>
             </div>
           </Card>
-        </div>
+        </motion.div>
       </div>
 
       {/* Styles (Custom animations) */}
@@ -930,13 +1046,26 @@ const RefinedFeatures = () => {
         }
 
       `}</style>
-    </section>
+    </motion.section>
   );
 };
 
 const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
+  const reduceMotion = useReducedMotion();
+  const revealProps = reduceMotion
+    ? { initial: false, whileInView: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 24 },
+        whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+      };
+
   return (
-    <section id="join" className="py-16 md:py-24 px-4 overflow-hidden">
+    <motion.section
+      id="join"
+      className="py-16 md:py-24 px-4 overflow-hidden"
+      viewport={{ once: true, amount: 0.2 }}
+      {...revealProps}
+    >
       <div className="max-w-5xl mx-auto relative">
         <div className="bg-[#1e293b] rounded-[2rem] md:rounded-[3rem] p-8 py-16 md:p-24 text-center relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
@@ -1001,7 +1130,7 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
           />
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
@@ -1137,6 +1266,23 @@ export default function JoinLanding() {
         }
         .animate-float-delayed {
           animation: float-delayed 5s ease-in-out infinite;
+          animation-delay: 1s;
+        }
+
+        @keyframes float-y {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        .animate-float-y {
+          animation: float-y 6s ease-in-out infinite;
+        }
+
+        @keyframes float-y-delayed {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+        .animate-float-y-delayed {
+          animation: float-y-delayed 5s ease-in-out infinite;
           animation-delay: 1s;
         }
 

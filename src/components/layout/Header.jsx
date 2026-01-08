@@ -61,7 +61,7 @@ const Header = ({
           className="flex items-baseline gap-2 group cursor-pointer text-left focus:outline-none"
           whileTap={{ scale: 0.98 }}
         >
-          <span className="text-lg md:text-xl font-bold tracking-tight brand-font text-slate-700 transition-colors duration-300 group-hover:text-[var(--color-accent)]">
+          <span className="text-lg md:text-xl font-bold tracking-tight font-outfit text-slate-700 transition-colors duration-300 group-hover:text-[var(--color-accent)]">
             Minecraft Community <InteractiveSprout />
           </span>
           {isMembershipPage && (
