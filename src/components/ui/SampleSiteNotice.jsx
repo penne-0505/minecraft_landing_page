@@ -1,3 +1,5 @@
+import { DEMO_NOTICE, MINECRAFT_DISCLAIMER } from "../../constants/demo";
+
 const SampleSiteNotice = () => (
   <section aria-label="Sample site notice" className="bg-white">
     <div className="max-w-screen-xl mx-auto px-4 md:px-8 pb-8">
@@ -9,7 +11,9 @@ const SampleSiteNotice = () => (
           !
         </span>
         <p className="font-bold">
-          このサイトはサンプルページです。実際の取引やサービス提供は行っていません。
+          {DEMO_NOTICE}
+          <br />
+          <span className="text-xs md:text-sm">{MINECRAFT_DISCLAIMER}</span>
         </p>
       </div>
     </div>

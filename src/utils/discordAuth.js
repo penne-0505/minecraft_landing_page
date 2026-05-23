@@ -1,4 +1,5 @@
 import { trackEvent, captureError } from "../analytics";
+import { DEMO_USER, IS_DEMO_MODE } from "../constants/demo";
 
 const STATE_STORAGE_KEY = "discord_oauth_state";
 const DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize";
@@ -45,6 +46,19 @@ export function beginDiscordLogin(returnToOverride, options = {}) {
   if (typeof window === "undefined") return;
   const context = options.context;
   const returnTo = resolveReturnTo(returnToOverride || options.returnTo);
+
+  if (IS_DEMO_MODE) {
+    const user = persistDiscordUser(DEMO_USER);
+    trackEvent("login_demo", {
+      provider: "discord",
+      ...(context ? { context } : {}),
+    });
+    if (user) {
+      window.location.href = returnTo;
+    }
+    return;
+  }
+
   const state = options.state || createDiscordOAuthState(returnTo);
 
   trackEvent("login_start", {
@@ -124,6 +138,11 @@ export async function exchangeDiscordCode(
     persistUser = true,
   } = {}
 ) {
+  if (IS_DEMO_MODE) {
+    const user = persistUser ? persistDiscordUser(DEMO_USER) : DEMO_USER;
+    return { ok: true, user, data: { user, demo: true } };
+  }
+
   if (!code) return { ok: false, reason: "missing_code" };
 
   try {

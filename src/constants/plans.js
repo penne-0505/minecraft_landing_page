@@ -1,8 +1,8 @@
 export const PLANS = {
   one_month: {
     price: 500,
-    unit: "回",
-    desc: "気軽にサーバーを支援",
+    unit: "表示例",
+    desc: "単発支援UIの表示サンプル",
     label: "One-Time",
     textColor: "text-lime-600",
     bgColor: "bg-lime-500",
@@ -13,8 +13,8 @@ export const PLANS = {
   },
   sub_monthly: {
     price: 500,
-    unit: "月",
-    desc: "継続的なサポート",
+    unit: "表示例",
+    desc: "月額支援UIの表示サンプル",
     label: "Monthly",
     textColor: "token-text-accent",
     bgColor: "token-bg-accent",
@@ -25,8 +25,8 @@ export const PLANS = {
   },
   sub_yearly: {
     price: 5000,
-    unit: "年",
-    desc: "１年分をまとめてお得に",
+    unit: "表示例",
+    desc: "年額支援UIの表示サンプル",
     label: "Yearly",
     textColor: "text-teal-600",
     bgColor: "bg-teal-600",

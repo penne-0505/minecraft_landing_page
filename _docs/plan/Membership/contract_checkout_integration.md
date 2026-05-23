@@ -3,7 +3,7 @@ title: Contract Checkout Integration Plan
 status: proposed
 draft_status: n/a
 created_at: 2025-12-14
-updated_at: 2025-12-23
+updated_at: 2026-05-23
 references:
   - ../../draft/contract_checkout_integration.md
   - ../../draft/contract_page_requirements.md
@@ -13,22 +13,22 @@ references:
 temp.js の UI モックを基に、契約前同意ページを Stripe Checkout フローへ統合し、同意メタデータを backend に連携する。
 
 ## Scope
-- Front: Contract ページのUI刷新（temp.jsモック踏襲）、同意必須のロジック実装、プラン未指定時リダイレクト、ヘルプ導線追加。
+- Front: Contract ページのUI刷新（temp.jsモック踏襲）、同意必須のロジック実装、プラン未指定時リダイレクト。
 - Common: プラン定数（priceType キー）を Contract/CTA 双方で共有。
-- Routing: `/help` 仮ページ設置（空でも可）。
+- Routing: `/help` は公開導線・ページを持たず、既存アクセスはトップへ恒久リダイレクトする。
 - Not in scope: 決済後のサクセス/キャンセル画面改修、計測イベント追加（後日）。
 
 ## Deliverables
 - 更新済み Contract ページ（UI・同意ロジック・メタデータ送信）。
 - 共通プラン定数の参照化（PricingComponent, Contract）。
-- `/help` へのリンク導線と仮ページ。
+- `/help` 導線と仮ページの削除。
 - ドキュメント更新（draft・plan・TODO）。
 
 ## Milestones / Steps
 1. プラン定数共有・priceType 統一（完了）  
 2. UI モック反映: Contract ページに temp.js のレイアウト/コンポーネントを移植し、必須同意のチェック状態・ボタン活性条件を実装。  
 3. エラーハンドリング: 401 ダイアログ→/membership リダイレクト、plan 未指定リダイレクト。  
-4. 導線追加: 戻る・キャンセルボタン、ヘルプリンク `/help`（仮ページも作成）。  
+4. 導線整理: 戻る・キャンセルボタンを維持し、ヘルプリンク `/help` と仮ページは削除する。
 5. メタデータ送信: `consent_roles/terms` を Checkout metadata にセット。  
 6. 表示確認・軽微なスタイル調整、回帰確認（CTA→Contract→Checkout）。  
 
@@ -47,5 +47,4 @@ temp.js の UI モックを基に、契約前同意ページを Stripe Checkout 
 - Checkout metadata に同意3項目が送信されること。  
 
 ## Follow-ups
-- `/help` ページの中身整備（別タスク可）。  
 - 計測イベントの追加（後日 M4 で対応）。  

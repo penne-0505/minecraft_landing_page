@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /contract
+Disallow: /thanks
+Disallow: /cancellation
+Disallow: /supporters
+Disallow: /legal
+Disallow: /auth
 
-Sitemap: https://minecraft-landing-page.pages.dev/sitemap.xml
+Sitemap: https://clover-support-demo.pages.dev/sitemap.xml

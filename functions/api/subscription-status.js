@@ -1,12 +1,17 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "../telemetry";
 import { requireSession } from "../auth";
+import { getDemoSubscription, isDemoMode, jsonResponse } from "../demo";
 
 export async function onRequest(context) {
   const { request, env } = context;
 
   if (request.method !== "GET") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isDemoMode(env)) {
+    return jsonResponse(getDemoSubscription());
   }
 
   const secretKey = env?.STRIPE_SECRET_KEY;

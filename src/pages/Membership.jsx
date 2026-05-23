@@ -26,6 +26,7 @@ import {
   exchangeDiscordCode,
   extractDiscordOAuthParams,
 } from "../utils/discordAuth";
+import { DEMO_NOTICE, IS_DEMO_MODE } from "../constants/demo";
 
 const Membership = () => {
   const [user, setUser] = useState(() => {
@@ -91,6 +92,12 @@ const Membership = () => {
   };
 
   const openPortal = async () => {
+    if (IS_DEMO_MODE) {
+      setPortalError("デモ公開版ではStripeポータルを開きません。画面上の導線確認のみできます。");
+      trackEvent("portal_demo_blocked");
+      return;
+    }
+
     if (!user) {
       beginDiscordLogin();
       return;
@@ -148,8 +155,9 @@ const Membership = () => {
     });
   };
 
-  const membershipTitle = "メンバーシップ";
-  const membershipDescription = "サポータープランの内容や参加手順、よくある質問をまとめています。";
+  const membershipTitle = "支援フローデモ";
+  const membershipDescription =
+    "Minecraft向けコミュニティ支援フローを題材にしたポートフォリオ用デモです。実際の決済や契約は行いません。";
 
   return (
     <div className="min-h-screen token-bg-main token-text-primary font-sans selection:bg-[var(--color-accent)] selection:text-white overflow-x-hidden relative">
@@ -223,13 +231,13 @@ const Membership = () => {
                 <div className="flex flex-col">
                   <span className="font-bold text-sm">
                     {checkoutStatus === "success"
-                      ? "決済が完了しました！"
-                      : "決済がキャンセルされました"}
+                      ? "デモ完了画面へ進みました"
+                      : "デモ導線を中断しました"}
                   </span>
                   <span className="text-xs md:text-sm">
                     {checkoutStatus === "success"
-                      ? "ロール付与は数秒〜1分ほどで反映されます。Discordで付与を確認してください。"
-                      : "もう一度購入する場合は、下のプランから再開できます。"}
+                      ? "実際の請求やDiscordロール付与は発生していません。"
+                      : "もう一度確認する場合は、下のプランから再開できます。"}
                   </span>
                 </div>
               </div>
@@ -239,7 +247,7 @@ const Membership = () => {
                     href="https://discord.com/channels/@me"
                     className="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold shadow-sm hover:bg-emerald-700 transition-colors"
                   >
-                    Discordを開く
+                    Discord画面を開く
                   </a>
                 ) : (
                   <button
@@ -339,9 +347,9 @@ const Membership = () => {
                   }}
                   className="text-sm md:text-base text-slate-100 font-body leading-relaxed max-w-lg mx-auto drop-shadow-md"
                 >
-                  サーバーの維持と進化を、一緒に支えませんか。
+                  サーバー支援導線の設計例を、実取引なしで確認できます。
                   <br className="hidden md:inline" />
-                  あなたの支援が、このコミュニティの未来を作ります。
+                  認証・決済・完了画面の責務分担を見せるためのデモです。
                 </motion.p>
 
                 <motion.div
@@ -363,7 +371,7 @@ const Membership = () => {
                   >
                     <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-2xl pointer-events-none"></span>
                     <HeartHandshake className="w-6 h-6 md:w-7 md:h-7" />
-                    支援プランを見る
+                    デモプランを見る
                   </motion.a>
                 </motion.div>
               </motion.div>
@@ -392,15 +400,15 @@ const Membership = () => {
         <section className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center gap-12 max-w-5xl mb-24">
           <div className="flex-1 space-y-6 text-center md:text-left">
             <h2 className="text-4xl md:text-5xl font-black token-text-display tracking-tight -translate-x-[0.1em]">
-              サポーターの証が、
+              支援者表示の体験を、
               <br />
-              <span className="token-text-cta">あなたを示す。</span>
+              <span className="token-text-cta">安全に試せる。</span>
             </h2>
             <p className="text-slate-600 font-body leading-relaxed text-sm">
-              専用のカラーとロールで、コミュニティ内での存在感が変わります。
+              専用ロールや支援者一覧を想定したUIを、実際の権限変更なしで確認できます。
               <br />
               <br />
-              限定チャンネルでは、アップデート情報をいち早くキャッチしたり、チームへ直接フィードバックを送ることができます。
+              ポートフォリオ公開用に、Discord・Stripe連携はデモ境界で止まるようにしています。
             </p>
             <div className="flex gap-2 justify-center md:justify-start">
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-[rgb(var(--color-accent-rgb)/0.1)] token-text-accent text-xs font-bold cursor-default">
@@ -428,12 +436,12 @@ const Membership = () => {
               </span>
 
               <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-4 text-center">
-                支援の方法を選ぶ
+                デモの表示パターンを選ぶ
               </h2>
               <p className="text-slate-500 font-body text-sm max-w-lg text-center leading-relaxed">
-                ライフスタイルに合わせて、3つのプランからお選びいただけます。
+                3つのプラン表示を切り替え、申し込み前後の画面遷移を確認できます。
                 <br />
-                まずは1ヶ月プランで試してみませんか？
+                {DEMO_NOTICE}
               </p>
             </div>
 
@@ -442,7 +450,7 @@ const Membership = () => {
             </div>
 
             <div className="text-center mt-12 text-xs text-slate-400 font-semibold max-w-lg mx-auto leading-relaxed">
-              すべてのプランで同じ特典を提供します。適用期間及び更新方法が異なります。
+              表示される価格・特典はUIサンプルです。実際の請求や特典提供はありません。
               <br />
             </div>
           </div>
@@ -461,9 +469,9 @@ const Membership = () => {
 
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex-1 text-center md:text-left">
-                <h3 className="text-2xl font-black text-slate-800 mb-3">契約内容の確認・変更</h3>
+                <h3 className="text-2xl font-black text-slate-800 mb-3">管理画面導線の確認</h3>
                 <p className="text-sm font-bold text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">
-                  支払い履歴の確認、カード情報の変更、プランの解約はこちら。
+                  本番では支払い履歴やプラン変更画面へ接続する想定です。デモ公開版では外部ポータルを開きません。
                 </p>
               </div>
 
@@ -487,7 +495,7 @@ const Membership = () => {
                       <div className="bg-slate-100 p-1 rounded text-slate-600">
                         <CreditCard size={16} />
                       </div>
-                      <span>Stripeポータルを開く</span>
+                      <span>{IS_DEMO_MODE ? "デモでは無効" : "Stripeポータルを開く"}</span>
                       <ArrowRight size={16} className="text-slate-400" />
                     </>
                   )}
@@ -533,24 +541,24 @@ const Membership = () => {
           </h2>
           <div className="space-y-4">
             <FAQItem
-              q="どんな支払い方法が使えますか？"
-              a="クレジットカード、デビットカード、コンビニ払い、PayPayに対応しています。"
+              q="実際に支払いは発生しますか？"
+              a="発生しません。ポートフォリオ用のデモとして、外部決済APIを呼ばない設定を既定にしています。"
             />
             <FAQItem
-              q="特典はいつもらえますか？"
-              a="支払い完了後、当日中にDiscordとゲーム内で使えるようになります。"
+              q="Discordロールは付与されますか？"
+              a="付与されません。ロール付与やGuild参加は本番参考実装として残しつつ、デモ公開版では実行されないようにしています。"
             />
             <FAQItem
-              q="解約はいつでもできますか？"
-              a="はい。このページの「契約内容の確認・変更」から、いつでも解約できます。"
+              q="Stripe連携は実装されていますか？"
+              a="参考実装としてPages Functions側に残していますが、デモモードではCheckout、Portal、Webhook、Subscription取得をモック応答に切り替えます。"
             />
             <FAQItem
-              q="解約したら特典はすぐ消えますか？"
-              a="いいえ。次の更新日まで引き続き特典をお使いいただけます。"
+              q="この画面は何を見せるものですか？"
+              a="静的React UIとCloudflare Pages Functionsで、認証・決済・完了後ページをどう分担するかを説明できる実績デモです。"
             />
             <FAQItem
-              q="集まった資金は何に使われますか？"
-              a="原則として全てが当サーバー及びサービスの維持管理費用に充てられます。ただし、資金の使用用途は予告無く変更される場合があります。"
+              q="Minecraft公式のサイトですか？"
+              a="いいえ。Minecraftを題材にした非公式のポートフォリオデモで、MojangまたはMicrosoftの承認・提携を示すものではありません。"
             />
           </div>
         </section>

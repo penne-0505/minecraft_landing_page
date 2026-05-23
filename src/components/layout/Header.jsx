@@ -4,6 +4,7 @@ import { LogOut, Menu, X } from "lucide-react";
 import InteractiveSprout from "../ui/InteractiveSprout";
 import { beginDiscordLogin } from "../../utils/discordAuth";
 import discordIcon from "../../assets/icons/Discord-Symbol-White.svg";
+import { DEMO_SITE } from "../../constants/demo";
 
 const Header = ({
   isLoggedIn,
@@ -62,11 +63,11 @@ const Header = ({
           whileTap={{ scale: 0.98 }}
         >
           <span className="text-lg md:text-xl font-bold tracking-tight font-outfit text-slate-700 transition-colors duration-300 group-hover:text-[var(--color-accent)]">
-            Minecraft Community <InteractiveSprout />
+            {DEMO_SITE.shortName} <InteractiveSprout />
           </span>
           {isMembershipPage && (
             <span className="token-text-accent font-semibold text-xs uppercase tracking-wide hidden sm:inline-block bg-[rgb(var(--color-accent-rgb)/0.1)] px-2 py-0.5 rounded-full border border-[rgb(var(--color-accent-rgb)/0.2)] group-hover:bg-[rgb(var(--color-accent-rgb)/0.2)] transition-colors">
-              Supporters
+              Demo
             </span>
           )}
         </motion.button>

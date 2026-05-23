@@ -35,7 +35,7 @@ const CommunityGoalWidget = () => (
     <div className="flex flex-col">
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors">
-          今月の維持費ゴール
+          デモ支援ゴール
         </span>
         <span className="text-xs font-semibold token-text-accent">78%</span>
       </div>

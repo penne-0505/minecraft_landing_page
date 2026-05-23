@@ -4,12 +4,18 @@
  */
 import { trackEvent, captureError } from "./telemetry";
 import { issueSessionCookie } from "./auth";
+import { getDemoUser, isDemoMode, jsonResponse } from "./demo";
 
 export async function onRequest(context) {
   const { request, env } = context;
 
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isDemoMode(env)) {
+    trackEvent("discord_oauth_demo_success", {}, env);
+    return jsonResponse({ user: getDemoUser(), demo: true });
   }
 
   const {

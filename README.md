@@ -1,8 +1,8 @@
-# Minecraft Support Landing
+# Clover Support Demo
 
-## 概要
+Minecraft向けコミュニティ支援フローを題材にした、ポートフォリオ用のReact + Cloudflare Pages Functionsデモです。
 
-MinecraftコミュニティのためのLPと、メンバーシップサービスの導線ページです。
+この公開版はデモモードを既定にしており、実際の決済、契約、Discord参加、ロール付与、ゲーム内特典提供は行いません。Minecraft / Mojang / Microsoft の公式サービス、承認済みサービス、提携サービスでもありません。
 
 <img width="1782" height="949" alt="image" src="https://github.com/user-attachments/assets/ac4e083a-97ac-48f2-ba06-69cf54f8232a" />
 <img width="1782" height="949" alt="image" src="https://github.com/user-attachments/assets/6998d249-338d-4a29-aa0c-f38437eb5891" />
@@ -12,7 +12,14 @@ MinecraftコミュニティのためのLPと、メンバーシップサービス
 <img width="1782" height="949" alt="image" src="https://github.com/user-attachments/assets/4aae92f0-ee57-4c97-8b7a-0df501071fe7" />
 
 
-## プレビュー
+## 何を見せるデモか
+
+- LP、支援プラン、申し込み前確認、完了画面、解約画面、支援者一覧のUIフロー
+- 静的ReactフロントとCloudflare Pages Functionsの責務分担
+- Discord OAuth、Stripe Checkout / Portal / Webhook、サポーター取得APIの参考実装
+- デモ公開時に外部APIを呼ばない安全境界
+
+## ローカルプレビュー
 
 前提: Node.js 18以上（開発マシンでは v25.2.1 で確認）。
 
@@ -20,15 +27,27 @@ MinecraftコミュニティのためのLPと、メンバーシップサービス
 npm install
 npm run dev   # http://localhost:5173 でプレビュー
 npm run build # プロダクションビルド
+npm run lint  # ESLint + Prettier check
+npm test      # Vitest
 ```
 
 Tailwind CSS は PostCSS 経由でビルドに組み込まれます。`src/styles.css` の `@tailwind` を起点に Vite で生成します。
 
-## 環境変数（デプロイ/Functions）
+## デモモード
 
-Cloudflare Pages + Pages Functions を利用する前提の構成です。外部連携系の Functions を動かすには以下の環境変数が必要です。
+`.env.example` では `DEMO_MODE=true` / `VITE_DEMO_MODE=true` を既定にしています。この状態では次のように動きます。
 
-### Pages Functions（必須）
+- `beginDiscordLogin` は実Discord OAuthへ遷移せず、モックユーザーを保存します。
+- `/demo-flow` は、一般流入向けLP導線とMembership導線をタブで説明する公開デモ用ハブです。
+- LP の Discord CTA は、`VITE_DISCORD_INVITE_URL` が未設定でも disabled にせず、toast から `/demo-flow?tab=lp` へ案内します。
+- `/create-checkout-session` はStripe Checkoutを作らず、デモ用の完了URLを返します。
+- `/create-portal-session` は410を返し、外部ポータルを開きません。
+- `/stripe-webhook` は署名検証やDiscord Bot API呼び出しをせず、デモとして受け流します。
+- `/api/supporters`, `/api/checkout-session`, `/api/subscription-status` はモックデータを返します。
+
+参考実装として実連携を検証する場合だけ、`DEMO_MODE=false` と `VITE_DEMO_MODE=false` を明示し、下記の環境変数を設定してください。
+
+### Pages Functions（参考実装）
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 - `DISCORD_CLIENT_ID`
@@ -49,13 +68,24 @@ Cloudflare Pages + Pages Functions を利用する前提の構成です。外部
 - `VITE_APP_BASE_URL`
 - `VITE_DISCORD_CLIENT_ID`
 - `VITE_DISCORD_REDIRECT_URI`
+- `VITE_DISCORD_INVITE_URL`（任意。未設定時は `/demo-flow?tab=lp` への toast 導線へ切り替え）
 - `VITE_SENTRY_DSN`（任意）
 - `VITE_GA4_MEASUREMENT_ID`（任意）
 
 ## 技術スタック
 - Vite + React 18
-- framer-motion / lucide-react
+- React Router / framer-motion / lucide-react
 - Tailwind CSS（PostCSS 経由のビルド）
+- Cloudflare Pages Functions
+- Stripe / Discord OAuth（デモでは無効、参考実装として保持）
+- Vitest / ESLint / Prettier
+
+## 公開時の注意
+
+- サイト名は独自名を主にし、Minecraftは説明語としてのみ扱います。
+- 主要画面とREADMEに「非公式」「実取引なし」を明記しています。
+- `/contract`, `/thanks`, `/cancellation`, `/supporters`, `/legal`, `/auth` は検索対象から外す設定です。
+- 法務ページは実サービス用の法的文書ではなく、デモ境界を説明する文書です。
 
 ## ライセンス
 

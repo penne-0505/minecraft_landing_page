@@ -1,29 +1,29 @@
 export const PRICING_COPY = {
   tabs: {
-    oneTime: "単発サポート",
-    subscription: "継続サポート",
+    oneTime: "単発表示",
+    subscription: "継続表示",
   },
   intervalToggle: {
-    monthly: "月払い",
-    yearly: "年払い",
-    yearlyBadge: "2ヶ月分無料",
-    oneTimeHelper: "必要なときだけ、気軽に支援できます",
+    monthly: "月額例",
+    yearly: "年額例",
+    yearlyBadge: "UIサンプル",
+    oneTimeHelper: "単発支援カードの表示サンプルです",
     aria: {
-      yearlyOn: "年払いを選択中。クリックで月払いに切り替え",
-      yearlyOff: "月払いを選択中。クリックで年払いに切り替え",
+      yearlyOn: "年額例を選択中。クリックで月額例に切り替え",
+      yearlyOff: "月額例を選択中。クリックで年額例に切り替え",
     },
   },
   planCard: {
-    recommendedBadge: "Best Value",
+    recommendedBadge: "Demo Highlight",
     planLabelSuffix: " Plan",
     pricePrefix: "¥",
     priceUnitPrefix: "/ ",
   },
   features: [
-    "サポーター限定Discordロール",
-    "ゲーム内での優遇",
-    "限定チャンネルへのアクセス",
-    "今後さらに追加予定...",
+    "Discordロール付与フローのUI例",
+    "支援者一覧表示のUI例",
+    "完了・解約画面への遷移例",
+    "実請求・実特典提供は行いません",
   ],
-  cta: "このプランで始める(デモ)",
+  cta: "デモ画面へ進む",
 };

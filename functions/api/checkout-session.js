@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "../telemetry";
 import { requireSession } from "../auth";
+import { getDemoCheckoutSession, isDemoMode, jsonResponse } from "../demo";
 
 const SUBSCRIPTION_OK_STATUSES = new Set(["trialing", "active", "past_due"]);
 
@@ -11,15 +12,20 @@ export async function onRequest(context) {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const secretKey = env?.STRIPE_SECRET_KEY;
-  if (!secretKey) {
-    return new Response("Missing STRIPE_SECRET_KEY", { status: 500 });
-  }
-
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("session_id");
   if (!sessionId) {
     return new Response("Missing session_id", { status: 400 });
+  }
+
+  if (isDemoMode(env)) {
+    const priceType = url.searchParams.get("plan") || "sub_monthly";
+    return jsonResponse(getDemoCheckoutSession({ sessionId, priceType }));
+  }
+
+  const secretKey = env?.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    return new Response("Missing STRIPE_SECRET_KEY", { status: 500 });
   }
 
   const sessionAuth = await requireSession(request, env);

@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "./telemetry";
 import { requireSession } from "./auth";
+import { isDemoMode, jsonResponse } from "./demo";
 
 /**
  * Create Stripe Checkout Session
@@ -11,6 +12,34 @@ export async function onRequest(context) {
 
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response("Invalid JSON", { status: 400 });
+  }
+
+  const { priceType, avatar_url, consent_roles, consent_terms } = body || {};
+  if (!priceType) {
+    return new Response("Missing priceType", { status: 400 });
+  }
+
+  const allowedPriceTypes = ["one_month", "sub_monthly", "sub_yearly"];
+  if (!allowedPriceTypes.includes(priceType)) {
+    return new Response("Invalid priceType", { status: 400 });
+  }
+
+  if (isDemoMode(env)) {
+    const appBaseUrl = env?.APP_BASE_URL || new URL(request.url).origin;
+    const url = `${appBaseUrl}/thanks?demo=1&plan=${encodeURIComponent(priceType)}`;
+    trackEvent("checkout_demo_session_created", { priceType }, env);
+    return jsonResponse({
+      demo: true,
+      url,
+      message: "Demo mode: no Stripe Checkout session was created.",
+    });
   }
 
   const {
@@ -31,21 +60,9 @@ export async function onRequest(context) {
     return new Response("Missing Stripe env", { status: 503 });
   }
 
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response("Invalid JSON", { status: 400 });
-  }
-
   const session = await requireSession(request, env);
   if (!session.ok) {
     return new Response(session.message, { status: session.status });
-  }
-
-  const { priceType, avatar_url, consent_roles, consent_terms } = body || {};
-  if (!priceType) {
-    return new Response("Missing priceType", { status: 400 });
   }
 
   const priceMap = {
@@ -55,10 +72,6 @@ export async function onRequest(context) {
   };
 
   const priceId = priceMap[priceType];
-  if (!priceId) {
-    return new Response("Invalid priceType", { status: 400 });
-  }
-
   // Use account default API version; avoid pinning to unavailable future versions.
   const stripe = new Stripe(STRIPE_SECRET_KEY);
 

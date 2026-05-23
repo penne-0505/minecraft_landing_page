@@ -54,7 +54,7 @@ describe("create-checkout-session", () => {
 
   it("returns 503 when Stripe env is missing", async () => {
     const env = createEnv({ STRIPE_SECRET_KEY: "" });
-    const request = createRequest({ method: "POST", json: {} });
+    const request = createRequest({ method: "POST", json: { priceType: "one_month" } });
     const response = await onRequest(createContext({ request, env }));
     expect(response.status).toBe(503);
   });
@@ -95,6 +95,19 @@ describe("create-checkout-session", () => {
 
     expect(body).toEqual({ url: "https://stripe/checkout" });
     expect(stripeMock.checkout.sessions.create).toHaveBeenCalled();
+  });
+
+  it("returns demo redirect without Stripe when demo mode is enabled", async () => {
+    const env = createEnv({ DEMO_MODE: "true", STRIPE_SECRET_KEY: "" });
+    const request = createRequest({ method: "POST", json: { priceType: "one_month" } });
+    const response = await onRequest(createContext({ request, env }));
+    const body = await readJson(response);
+
+    expect(response.status).toBe(200);
+    expect(body.demo).toBe(true);
+    expect(body.url).toBe("https://example.com/thanks?demo=1&plan=one_month");
+    expect(stripeMock.checkout.sessions.create).not.toHaveBeenCalled();
+    expect(requireSession).not.toHaveBeenCalled();
   });
 
   it("returns 500 on Stripe error", async () => {

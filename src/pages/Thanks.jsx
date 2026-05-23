@@ -16,6 +16,7 @@ import Footer from "../components/layout/Footer";
 import { beginDiscordLogin } from "../utils/discordAuth";
 import { PLANS } from "../constants/plans";
 import Seo from "../components/Seo";
+import { DEMO_DISCORD_INVITE_URL, IS_DEMO_MODE } from "../constants/demo";
 
 const FALLBACK_AVATAR = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg";
 
@@ -87,14 +88,20 @@ const GlowAura = () => (
   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-yellow-200/40 via-[color:rgb(var(--color-accent-rgb)/0.1)] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 );
 
+const getDemoPlanKey = () => {
+  const url = new URL(window.location.href);
+  const plan = url.searchParams.get("plan");
+  return plan && PLANS[plan] ? plan : "sub_monthly";
+};
+
 export default function Thanks() {
-  const thanksTitle = "お申し込み完了";
-  const thanksDescription = "メンバーシップ参加後の案内と次のステップをまとめています。";
+  const thanksTitle = "完了画面デモ";
+  const thanksDescription =
+    "支援フロー完了後の案内画面を再現したデモです。実際の決済やロール付与は行っていません。";
   const mockUser = {
     name: "Supporter",
     avatar: FALLBACK_AVATAR,
   };
-  const mockTransactionId = "tx_mock_20240101";
   const [copied, setCopied] = useState(false);
   const [user, setUser] = useState(() => {
     try {
@@ -107,7 +114,9 @@ export default function Thanks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const displayUser = user || mockUser;
-  const displayTransactionId = session?.transaction_id || mockTransactionId;
+  const demoPlanKey = useMemo(() => getDemoPlanKey(), []);
+  const demoPlan = PLANS[demoPlanKey];
+  const displayTransactionId = session?.transaction_id || `tx_demo_${demoPlanKey}`;
 
   const sessionId = useMemo(() => {
     const url = new URL(window.location.href);
@@ -115,6 +124,11 @@ export default function Thanks() {
   }, []);
 
   useEffect(() => {
+    if (IS_DEMO_MODE) {
+      setLoading(false);
+      return;
+    }
+
     if (!sessionId) {
       setError("決済セッションが見つかりませんでした。");
       setLoading(false);
@@ -176,16 +190,16 @@ export default function Thanks() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const planName = useMemo(() => {
-    if (!session) return "Supporter Plan";
+    if (!session) return `${demoPlan.label} Plan`;
     const plan = session.price_type ? PLANS[session.price_type] : null;
     if (plan?.label) return `${plan.label} Plan`;
     return session.line_item_name || "Supporter Plan";
-  }, [session]);
+  }, [demoPlan.label, session]);
 
   const amountText = useMemo(() => {
-    if (!session) return formatCurrency(500, "JPY");
+    if (!session) return `表示例 ${formatCurrency(demoPlan.price, "JPY")}`;
     return formatCurrency(session.amount_total, session.currency);
-  }, [session]);
+  }, [demoPlan.price, session]);
 
   const dateText = useMemo(() => {
     if (!session?.created) {
@@ -197,7 +211,7 @@ export default function Thanks() {
   }, [session]);
 
   const paymentMethod = useMemo(() => {
-    if (!session) return resolvePaymentMethodLabel(["card"]);
+    if (!session) return "Demo";
     return resolvePaymentMethodLabel(session.payment_method_types);
   }, [session]);
 
@@ -207,7 +221,13 @@ export default function Thanks() {
 
   return (
     <div className="min-h-screen token-bg-main font-sans selection:bg-[color:rgb(var(--color-accent-rgb)/0.3)] token-text-primary flex flex-col overflow-hidden relative">
-      <Seo title={thanksTitle} description={thanksDescription} path="/thanks" type="website" />
+      <Seo
+        title={thanksTitle}
+        description={thanksDescription}
+        path="/thanks"
+        type="website"
+        noIndex
+      />
       <style>{`
         .text-gradient-gold {
           background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 50%, #F59E0B 100%);
@@ -307,18 +327,18 @@ export default function Thanks() {
             >
               <div className="flex items-center justify-center gap-2 mb-2 text-yellow-500 font-bold uppercase tracking-widest text-xs">
                 <PartyPopper size={16} />
-                <span>Welcome to the club</span>
+                <span>Demo flow complete</span>
                 <PartyPopper size={16} className="scale-x-[-1]" />
               </div>
               <h1 className="font-display text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight leading-tight">
-                Thank You,
+                Demo Complete,
                 <br />
                 <span className="text-gradient-gold">{displayUser.name || "Supporter"}!</span>
               </h1>
               <p className="font-body text-slate-500 font-semibold text-lg md:text-xl max-w-sm mx-auto">
-                ご支援ありがとうございます！
+                完了画面の表示例です。
                 <br />
-                あなたのサポートがサーバーの力になります。
+                実際の支払い、契約、Discordロール付与は発生していません。
               </p>
             </motion.div>
 
@@ -345,7 +365,7 @@ export default function Thanks() {
                       <div className="flex justify-between items-start mb-6">
                         <div className="text-left">
                           <span className="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-bold text-[10px] uppercase tracking-wider mb-2">
-                            Official Supporter
+                            Demo Supporter
                           </span>
                           <h3 className="font-display font-black text-xl text-slate-800">
                             {planName}
@@ -355,7 +375,7 @@ export default function Thanks() {
                           <div className="font-display font-bold text-2xl token-text-accent">
                             {amountText}
                           </div>
-                          <div className="text-xs font-bold text-slate-400">Paid</div>
+                          <div className="text-xs font-bold text-slate-400">Demo Only</div>
                         </div>
                       </div>
 
@@ -370,15 +390,13 @@ export default function Thanks() {
                           <div className="font-bold text-slate-700">{dateText}</div>
                         </div>
                         <div>
-                          <div className="text-slate-400 text-xs font-bold mb-1">Payment</div>
+                          <div className="text-slate-400 text-xs font-bold mb-1">Mode</div>
                           <div className="font-bold text-slate-700 flex items-center gap-2">
                             {paymentMethod}
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <div className="text-slate-400 text-xs font-bold mb-1">
-                            Transaction ID
-                          </div>
+                          <div className="text-slate-400 text-xs font-bold mb-1">Demo ID</div>
                           <div
                             onClick={handleCopyId}
                             className={`group flex items-center justify-between bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 transition-colors ${
@@ -419,17 +437,17 @@ export default function Thanks() {
                   </div>
                   <h3 className="font-display font-black text-slate-800 mb-1">Check Discord</h3>
                   <p className="text-xs text-slate-500 font-semibold mb-4">
-                    ロールが付与されました！
+                    ロール付与後の案内UIです。
                     <br />
-                    限定チャンネルへようこそ。
+                    実際のDiscord操作は行っていません。
                   </p>
                   <a
-                    href={import.meta.env.VITE_DISCORD_INVITE_URL}
+                    href={import.meta.env.VITE_DISCORD_INVITE_URL || DEMO_DISCORD_INVITE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-auto w-full py-2 rounded-lg token-bg-cta text-white text-sm font-bold shadow-[0_3px_0_var(--color-cta-shadow)] active:shadow-none active:translate-y-[3px] transition-all flex items-center justify-center gap-2"
                   >
-                    Open Discord <ExternalLink size={14} />
+                    Discordを開く <ExternalLink size={14} />
                   </a>
                 </div>
               </div>
@@ -445,7 +463,7 @@ export default function Thanks() {
                 className="text-slate-400 font-bold font-body text-sm hover:text-slate-600 transition-colors flex items-center justify-center gap-2 mx-auto"
               >
                 <Home size={16} />
-                Return to Top Page
+                トップページへ戻る
               </a>
             </motion.div>
           </div>

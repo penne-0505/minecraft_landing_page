@@ -27,8 +27,9 @@ const Raindrop = ({ delay, x }) => (
 );
 
 export default function CancellationSuccessPage() {
-  const cancellationTitle = "解約手続き";
-  const cancellationDescription = "メンバーシップの解約状況と次回更新日の案内ページです。";
+  const cancellationTitle = "解約画面デモ";
+  const cancellationDescription =
+    "支援フロー解約後の案内画面を再現したデモです。実際の契約変更は行っていません。";
   const mockSubscription = {
     price_type: "sub_monthly",
     plan_label: "Monthly Supporter",
@@ -135,6 +136,7 @@ export default function CancellationSuccessPage() {
         description={cancellationDescription}
         path="/cancellation"
         type="website"
+        noIndex
       />
       {/* Subtle Rain Animation (Melancholic but calm) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-30">
@@ -241,14 +243,14 @@ export default function CancellationSuccessPage() {
               className="mb-10"
             >
               <h1 className="font-display text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
-                またお待ちしております
+                解約完了画面のデモ
               </h1>
               <p className="font-body text-slate-500 font-semibold text-sm md:text-base leading-relaxed max-w-sm mx-auto">
-                解約手続きが完了しました。
+                解約後の表示例です。
                 <br />
-                これまでご支援いただき、
+                実際の契約変更や
                 <br />
-                本当にありがとうございました。
+                ロール剥奪は行っていません。
               </p>
             </motion.div>
 
@@ -269,7 +271,7 @@ export default function CancellationSuccessPage() {
                       <h3 className="font-display font-black text-lg text-slate-700">{planName}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="inline-block w-2 h-2 rounded-full bg-slate-400" />
-                        <span className="text-sm font-bold text-slate-400">キャンセル済み</span>
+                        <span className="text-sm font-bold text-slate-400">デモ表示</span>
                       </div>
                     </div>
 
@@ -280,7 +282,7 @@ export default function CancellationSuccessPage() {
                       </div>
                       <div>
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                          残りのアクセス期間
+                          表示上の残り期間
                         </div>
                         <div className="font-display font-bold text-slate-700 text-sm">
                           {daysLeft} 日
@@ -293,7 +295,7 @@ export default function CancellationSuccessPage() {
                     <Calendar className="text-slate-400 shrink-0 mt-0.5" size={18} />
                     <p className="text-sm text-slate-600 font-body leading-relaxed">
                       <strong className="text-slate-800">{endDateText}</strong>{" "}
-                      まで特典（Discordロール、ゲーム内アイテム等）は引き続きご利用いただけます。期間終了後に自動的に無効化されます。
+                      までアクセスが残る想定のUIです。実際の特典提供や自動無効化は行われません。
                     </p>
                   </div>
                 </div>
@@ -317,7 +319,7 @@ export default function CancellationSuccessPage() {
                     size={16}
                     className="group-hover:-rotate-180 transition-transform duration-500"
                   />
-                  気が変わりましたか？ プランを再開する
+                  メンバーシップ画面へ戻る
                 </a>
               </div>
 
@@ -328,7 +330,7 @@ export default function CancellationSuccessPage() {
                   className="text-slate-400 font-bold font-body text-sm hover:text-slate-600 transition-colors flex items-center justify-center gap-2 mx-auto"
                 >
                   <Home size={16} />
-                  Return to Top Page
+                  トップページへ戻る
                 </a>
               </div>
             </motion.div>

@@ -116,6 +116,7 @@ const LegalDocPage = ({ docKey }) => {
         description={doc?.description || "現在はご案内を行っていません。"}
         path={doc?.path || "/legal"}
         type="article"
+        noIndex
       />
       <main className="container mx-auto px-4 md:px-6 py-14 max-w-5xl">
         <div className="flex items-center justify-start gap-3 mb-5">

@@ -1,11 +1,17 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "./telemetry";
+import { isDemoMode } from "./demo";
 
 export async function onRequest(context) {
   const { request, env } = context;
 
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isDemoMode(env)) {
+    trackEvent("stripe_webhook_demo_ignored", {}, env);
+    return new Response("Demo mode: webhook ignored", { status: 200 });
   }
 
   const stripe = getStripe(env);

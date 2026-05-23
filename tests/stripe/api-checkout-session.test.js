@@ -76,6 +76,24 @@ describe("api/checkout-session", () => {
     expect(response.status).toBe(500);
   });
 
+  it("returns demo session without Stripe when demo mode is enabled", async () => {
+    const env = createEnv({ DEMO_MODE: "true", STRIPE_SECRET_KEY: "" });
+    const request = createRequest({
+      method: "GET",
+      url: "https://example.com/api/checkout-session?session_id=cs_demo&plan=sub_yearly",
+    });
+    const response = await onRequest(createContext({ request, env }));
+    const body = await readJson(response);
+
+    expect(response.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.demo).toBe(true);
+    expect(body.session.id).toBe("cs_demo");
+    expect(body.session.price_type).toBe("sub_yearly");
+    expect(stripeMock.checkout.sessions.retrieve).not.toHaveBeenCalled();
+    expect(requireSession).not.toHaveBeenCalled();
+  });
+
   it("returns 400 when session_id missing", async () => {
     const request = createRequest({
       method: "GET",

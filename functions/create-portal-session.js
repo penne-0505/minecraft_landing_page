@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "./telemetry";
 import { requireSession } from "./auth";
+import { demoUnavailableResponse, isDemoMode } from "./demo";
 
 /**
  * Create Stripe Billing Portal session for the logged-in Discord user.
@@ -11,6 +12,11 @@ export async function onRequest(context) {
 
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isDemoMode(env)) {
+    trackEvent("portal_demo_blocked", {}, env);
+    return demoUnavailableResponse("Demo mode: Stripe Billing Portal is disabled.");
   }
 
   const { STRIPE_SECRET_KEY, APP_BASE_URL } = env;

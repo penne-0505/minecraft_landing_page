@@ -12,6 +12,7 @@ const baseEnv = {
   DISCORD_ROLE_MEMBER_ID: "discord_role_member_id",
   APP_BASE_URL: "https://example.com",
   AUTH_TOKEN_SECRET: "auth_token_secret",
+  DEMO_MODE: "false",
   DEBUG_TELEMETRY: "false",
 };
 

@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { trackEvent, captureError } from "../telemetry";
+import { getDemoSupporters, isDemoMode, jsonResponse } from "../demo";
 
 const PLAN_PRIORITY = { Yearly: 3, Monthly: 2, Ticket: 1, Supporter: 0 };
 const DISCORD_AVATAR_BASE = "https://cdn.discordapp.com";
@@ -9,6 +10,13 @@ export async function onRequest(context) {
 
   if (request.method !== "GET") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isDemoMode(env)) {
+    trackEvent("supporters_demo_list_success", {}, env);
+    return jsonResponse(getDemoSupporters(), {
+      headers: { "Cache-Control": "public, max-age=60" },
+    });
   }
 
   const config = getConfig(env);

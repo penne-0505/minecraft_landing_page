@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { DEMO_SITE } from "../constants/demo";
 
 const getBaseUrl = () => {
   if (import.meta?.env?.VITE_APP_BASE_URL) {
@@ -12,10 +13,8 @@ const getBaseUrl = () => {
 
 const getSiteDefaults = () => ({
   baseUrl: getBaseUrl(),
-  siteName: import.meta.env.VITE_SITE_NAME || "Clover Support",
-  description:
-    import.meta.env.VITE_SITE_DESCRIPTION ||
-    "建築・冒険・雑談まで自由に遊べるDiscordコミュニティ。参加方法や雰囲気を紹介します。",
+  siteName: import.meta.env.VITE_SITE_NAME || DEMO_SITE.name,
+  description: import.meta.env.VITE_SITE_DESCRIPTION || DEMO_SITE.description,
   ogImage: import.meta.env.VITE_SITE_OG_IMAGE || "",
   logo: import.meta.env.VITE_SITE_LOGO || "",
   twitter: import.meta.env.VITE_SITE_TWITTER || "",

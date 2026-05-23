@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   MessageCircle,
   Map,
@@ -95,14 +95,7 @@ const normalizeDiscordInviteUrl = (rawUrl) => {
 };
 
 const DISCORD_INVITE_URL = normalizeDiscordInviteUrl(import.meta.env.VITE_DISCORD_INVITE_URL);
-const HAS_DISCORD_INVITE_URL = DISCORD_INVITE_URL.length > 0;
-
-const handleMissingDiscordInvite = (event) => {
-  event?.preventDefault?.();
-  if (typeof window !== "undefined") {
-    window.alert("Discord招待URLの設定が未完了です。時間を置いて再度お試しください。");
-  }
-};
+const HAS_PUBLIC_DISCORD_INVITE_URL = DISCORD_INVITE_URL.length > 0;
 
 // --- Helper Components ---
 
@@ -152,6 +145,56 @@ const Button = ({ children, variant = "primary", className = "", href, ...props 
   );
 };
 
+const DemoInviteToast = ({ isVisible, onClose }) => (
+  <AnimatePresence>
+    {isVisible && (
+      <motion.aside
+        role="status"
+        aria-live="polite"
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 18, scale: 0.98 }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed inset-x-4 bottom-4 z-[70] mx-auto max-w-xl rounded-2xl border-2 border-[#d1fae5] bg-white/95 p-4 text-[#1e293b] shadow-2xl backdrop-blur-md md:bottom-6 md:p-5"
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#5865F2] text-white shadow-[0_3px_0_#3d46a8]"
+            aria-hidden="true"
+          >
+            <MessageCircle className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-display text-lg font-black leading-tight text-[#1e293b]">
+              公開デモ用にDiscord招待は外しています
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-600">
+              本番想定では招待URLへ進みます。ここでは安全なモック導線として、参加・支援フローを確認できます。
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <a
+                href="/demo-flow?tab=lp"
+                className="inline-flex items-center justify-center rounded-xl bg-[#5fbb4e] px-4 py-2.5 text-sm font-black text-white shadow-[0_3px_0_#469e38] transition hover:bg-[#4ea540] active:translate-y-[3px] active:shadow-none"
+              >
+                公開デモの導線を見る
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#5fbb4e]/30"
+            aria-label="通知を閉じる"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </motion.aside>
+    )}
+  </AnimatePresence>
+);
+
 const Card = ({ children, className = "", delay = 0 }) => {
   return (
     <div
@@ -172,7 +215,6 @@ const PhotoFrame = ({
   image,
   sizes,
   loading = "lazy",
-  fetchPriority,
   rotate = "rotate-0",
   delay = 0,
   className = "",
@@ -191,7 +233,6 @@ const PhotoFrame = ({
           height={image.height}
           loading={loading}
           decoding="async"
-          fetchPriority={fetchPriority}
           alt={caption || ""}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
@@ -284,7 +325,7 @@ const Hero = () => {
             <br />
             雑談で夜を過ごす人。
             <br />
-            200名が集まるこのサーバーでは、
+            200名規模を想定したこのデモでは、
             <br />
             建築 どんな遊び方も、自然に共存しています。
           </motion.p>
@@ -299,7 +340,7 @@ const Hero = () => {
               href="#join"
             >
               <Flag className="w-5 h-5 mr-2" />
-              参加する
+              参加導線を見る
             </Button>
             <Button
               variant="ghost"
@@ -332,11 +373,10 @@ const Hero = () => {
               }}
             >
               <PhotoFrame
-                caption="ダミーテキスト"
+                caption="拠点づくり"
                 image={joinImages.heroMain}
                 sizes={IMAGE_SIZES.heroMain}
                 loading="eager"
-                fetchPriority="high"
                 rotate="rotate-0"
                 className={activeHeroPhoto === "main" ? "scale-105 !shadow-2xl" : ""}
               />
@@ -357,7 +397,7 @@ const Hero = () => {
             >
               <div className="animate-float-y-delayed">
                 <PhotoFrame
-                  caption="ダミーテキスト"
+                  caption="探索記録"
                   image={joinImages.heroRight}
                   sizes={IMAGE_SIZES.heroRight}
                   loading="lazy"
@@ -383,7 +423,7 @@ const Hero = () => {
             >
               <div className="animate-float-y">
                 <PhotoFrame
-                  caption="ダミーテキスト"
+                  caption="イベント広場"
                   image={joinImages.heroLeft}
                   sizes={IMAGE_SIZES.heroLeft}
                   loading="lazy"
@@ -458,7 +498,7 @@ const MemoryLane = () => {
               Gallery
             </h3>
             <h2 className="text-3xl md:text-4xl font-display font-black text-[#1e293b] mt-3">
-              サーバーの風景
+              コミュニティの風景
             </h2>
           </motion.div>
         </div>
@@ -1051,7 +1091,7 @@ const RefinedFeatures = () => {
   );
 };
 
-const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
+const CTA = ({ discordInviteProps }) => {
   const reduceMotion = useReducedMotion();
   const revealProps = reduceMotion
     ? { initial: false, whileInView: { opacity: 1, y: 0 } }
@@ -1095,7 +1135,7 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
               ここで、始めよう。
             </h2>
             <p className="font-normal text-slate-300 text-base md:text-xl max-w-2xl mx-auto leading-relaxed mt-4 md:mt-6">
-              200名以上が参加するコミュニティ。
+              200名以上の参加を想定したコミュニティ。
               <br />
               参加に必要なのは、Discordアカウントだけです。
             </p>
@@ -1103,12 +1143,12 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 md:mt-8 px-4 md:px-0">
               <Button
                 variant="discord"
-                className={`px-8 md:px-12 py-4 md:py-5 text-lg md:text-xl w-full sm:w-auto shadow-lg hover:shadow-xl hover:scale-[1.03] transition-all relative overflow-hidden group ${discordInviteDisabledClass}`}
+                className="px-8 md:px-12 py-4 md:py-5 text-lg md:text-xl w-full sm:w-auto shadow-lg hover:shadow-xl hover:scale-[1.03] transition-all relative overflow-hidden group"
                 {...discordInviteProps}
               >
                 <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-xl pointer-events-none"></span>
                 <img src={discordIcon} alt="" aria-hidden="true" className="w-6 h-6 mr-2" />
-                Discordに参加する
+                Discord導線を見る
               </Button>
             </div>
           </div>
@@ -1116,7 +1156,7 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
 
         <div className="absolute -top-10 -right-4 sm:-top-12 sm:-right-6 md:-top-12 md:-right-8 transform rotate-6 animate-float z-20">
           <PhotoFrame
-            caption="ダミー"
+            caption="建築ギャラリー"
             image={joinImages.ctaRight}
             sizes={IMAGE_SIZES.ctaRight}
             className="w-[6.3rem] sm:w-40 md:w-48"
@@ -1124,7 +1164,7 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
         </div>
         <div className="hidden md:block absolute -bottom-8 -left-8 transform -rotate-3 animate-float-delayed z-20">
           <PhotoFrame
-            caption="ダミーテキスト"
+            caption="夜の集合場所"
             image={joinImages.ctaLeft}
             sizes={IMAGE_SIZES.ctaLeft}
             className="w-40"
@@ -1138,12 +1178,13 @@ const CTA = ({ discordInviteProps, discordInviteDisabledClass }) => {
 // --- Main App Component ---
 
 export default function JoinLanding() {
+  const [isDemoInviteToastVisible, setIsDemoInviteToastVisible] = useState(false);
   const defaults = getSiteDefaults();
   const canonical = normalizeUrl(defaults.baseUrl, "/");
   const ogImage = defaults.ogImage || normalizeUrl(defaults.baseUrl, joinImages.heroMain?.src);
-  const joinTitle = "Discordメンバー募集";
+  const joinTitle = "コミュニティLPデモ";
   const joinDescription =
-    "建築・冒険・雑談まで自由に遊べるDiscordコミュニティ。200名が集まるサーバーの参加方法や雰囲気を紹介します。";
+    "Minecraft向けコミュニティLPを題材にしたポートフォリオ用デモです。実際の参加受付や公式提携を示すものではありません。";
   const organization = {
     "@type": "Organization",
     "@id": canonical ? `${canonical}#organization` : undefined,
@@ -1192,15 +1233,21 @@ export default function JoinLanding() {
     ensureJoinLandingFonts();
   }, []);
 
-  const discordInviteProps = HAS_DISCORD_INVITE_URL
-    ? { href: DISCORD_INVITE_URL, target: "_blank", rel: "noopener noreferrer" }
-    : {
-        onClick: handleMissingDiscordInvite,
-        "aria-disabled": true,
-        title: "Discord招待URLの設定が未完了です",
-      };
+  const showDemoInviteToast = (event) => {
+    event?.preventDefault?.();
+    setIsDemoInviteToastVisible(true);
+  };
 
-  const discordInviteDisabledClass = HAS_DISCORD_INVITE_URL ? "" : "opacity-70 cursor-not-allowed";
+  const discordInviteProps = HAS_PUBLIC_DISCORD_INVITE_URL
+    ? {
+        href: DISCORD_INVITE_URL,
+        target: "_blank",
+        rel: "noopener noreferrer",
+      }
+    : {
+        href: "#demo-discord-invite",
+        onClick: showDemoInviteToast,
+      };
 
   const navItems = [
     { href: "#memories", label: "ギャラリー" },
@@ -1210,22 +1257,14 @@ export default function JoinLanding() {
   ];
 
   const headerAction = (
-    <Button
-      variant="discord"
-      className={`px-5 py-2 text-sm ${discordInviteDisabledClass}`}
-      {...discordInviteProps}
-    >
+    <Button variant="discord" className="px-5 py-2 text-sm" {...discordInviteProps}>
       <img src={discordIcon} alt="" aria-hidden="true" className="w-4 h-4 mr-2" />
       Discordに参加
     </Button>
   );
 
   const mobileHeaderAction = (
-    <Button
-      variant="discord"
-      className={`w-full py-3 ${discordInviteDisabledClass}`}
-      {...discordInviteProps}
-    >
+    <Button variant="discord" className="w-full py-3" {...discordInviteProps}>
       Discordに参加
     </Button>
   );
@@ -1316,11 +1355,12 @@ export default function JoinLanding() {
         <MemoryLane />
         <Stories />
         <RefinedFeatures />
-        <CTA
-          discordInviteProps={discordInviteProps}
-          discordInviteDisabledClass={discordInviteDisabledClass}
-        />
+        <CTA discordInviteProps={discordInviteProps} />
       </main>
+      <DemoInviteToast
+        isVisible={isDemoInviteToastVisible}
+        onClose={() => setIsDemoInviteToastVisible(false)}
+      />
       <Footer onScrollTop={scrollToTop} />
     </div>
   );

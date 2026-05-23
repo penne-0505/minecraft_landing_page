@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, AlertCircle, Loader2, ArrowRight, Users } from "lucide-react";
-import { trackEvent } from "../analytics";
+import { captureError, trackEvent } from "../analytics";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import PricingComponent from "../components/ui/PricingComponent";
@@ -13,6 +13,7 @@ import {
   exchangeDiscordCode,
   extractDiscordOAuthParams,
 } from "../utils/discordAuth";
+import { IS_DEMO_MODE } from "../constants/demo";
 
 const checkboxTitleOffsets = {
   支援者一覧に表示する: "-translate-x-[0.03em]",
@@ -78,8 +79,9 @@ export const CheckboxCard = ({ checked, onChange, icon, title, description, tag 
 export default function Contract() {
   const [searchParams] = useSearchParams();
   const planParam = searchParams.get("plan");
-  const contractTitle = "プラン申し込み";
-  const contractDescription = "メンバーシップの申し込み前に条件を確認し、決済へ進みます。";
+  const contractTitle = "申し込みフローデモ";
+  const contractDescription =
+    "支援申し込み前の確認画面を再現したポートフォリオ用デモです。実際の規約同意や請求は発生しません。";
   const mockUser = {
     name: "Supporter",
     discriminator: "0000",
@@ -149,9 +151,9 @@ export default function Contract() {
     beginDiscordLogin(undefined, { context: "contract" });
   };
 
-  // Portfolio: bypass access gate for /contract.
-  /*
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
+
     if (!planParam) {
       window.location.replace("/membership");
       return;
@@ -164,7 +166,6 @@ export default function Contract() {
       return;
     }
   }, [user, planParam]);
-  */
 
   const toggleAgreement = (key) => {
     setAgreements((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -178,8 +179,11 @@ export default function Contract() {
     setIsLoading(true);
     trackEvent("checkout_start", { priceType: displayPlanParam });
 
-    // Portfolio mock: skip Stripe checkout, go directly to thanks page.
-    /*
+    if (IS_DEMO_MODE) {
+      window.location.href = `/thanks?demo=1&plan=${encodeURIComponent(displayPlanParam)}`;
+      return;
+    }
+
     try {
       const res = await fetch("/create-checkout-session", {
         method: "POST",
@@ -219,8 +223,6 @@ export default function Contract() {
       setError("ネットワークエラーが発生しました。しばらくしてからもう一度お試しください。");
       setIsLoading(false);
     }
-    */
-    window.location.href = "/thanks";
   };
 
   const isPayable = agreements.discordRole && agreements.termsAccepted && !isLoading;
@@ -250,6 +252,7 @@ export default function Contract() {
         description={contractDescription}
         path="/contract"
         type="website"
+        noIndex
       />
       <style>{`
         .btn-push:active { transform: translateY(4px); box-shadow: none !important; }
@@ -287,10 +290,10 @@ export default function Contract() {
             <div className="lg:col-span-7 order-1 lg:order-2 space-y-8">
               <motion.div variants={itemVariants} className="mb-2 text-left">
                 <h1 className="font-display text-3xl md:text-4xl font-black text-slate-900 mb-2 -translate-x-[0.04em]">
-                  サポート内容の確認
+                  デモ内容の確認
                 </h1>
                 <p className="font-body text-slate-500 font-semibold">
-                  決済前の最終確認です。この段階では請求は発生しません。
+                  申し込み前確認画面のサンプルです。この段階でも、この先でも請求は発生しません。
                 </p>
               </motion.div>
 
@@ -302,7 +305,7 @@ export default function Contract() {
                     onChange={() => toggleAgreement("showSupporterList")}
                     icon={<Users size={20} />}
                     title="支援者一覧に表示する"
-                    description="支援者一覧に名前を掲載します（後からいつでも変更できます）。"
+                    description="支援者一覧UIへ名前を掲載する想定の表示サンプルです。"
                     tag="任意"
                   />
 
@@ -342,14 +345,14 @@ export default function Contract() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-display font-bold text-slate-800 text-lg inline-block -translate-x-[0.02em]">
-                            Discordロールの付与
+                            Discordロール付与の表示
                           </span>
                           <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
                             必須
                           </span>
                         </div>
                         <p className="font-body text-slate-500 text-sm leading-tight">
-                          ゲーム内特典付与のため、サポーターロールを自動付与します。
+                          実際のDiscordロール付与は行わず、同意UIの挙動だけを確認します。
                         </p>
                       </div>
                     </label>
@@ -387,14 +390,14 @@ export default function Contract() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-display font-bold text-slate-800 text-lg inline-block -translate-x-[0.025em]">
-                            利用規約に同意する
+                            デモ条件を確認する
                           </span>
                           <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
                             必須
                           </span>
                         </div>
                         <p className="font-body text-slate-500 text-sm leading-tight">
-                          これはモックであり、実際の規約同意は求めていない。
+                          実際の規約同意ではなく、完了画面へ進むためのデモ操作です。
                         </p>
                       </div>
                     </label>
@@ -430,8 +433,7 @@ export default function Contract() {
                         <Loader2 className="animate-spin" />
                       ) : (
                         <>
-                          {/* <span>{isPayable ? "Stripeで決済する" : "同意が必要"}</span> */}
-                          <span>{isPayable ? "完了画面を見る" : "チェックで次に遷移"}</span>
+                          <span>{isPayable ? "完了画面を見る" : "確認項目をチェック"}</span>
                           <ArrowRight size={20} strokeWidth={3} />
                         </>
                       )}

@@ -146,7 +146,7 @@ const DiscordMemberListMock = ({ user }) => {
 
       <div className="p-4 bg-[#313338]">
         <div className="text-[#949ba4] text-xs font-semibold uppercase tracking-wide mb-3 px-1 hover:text-[#dbdee1] transition-colors cursor-default">
-          Supporters — 1
+          Demo Supporters — 1
         </div>
 
         <motion.div
@@ -186,7 +186,7 @@ const DiscordMemberListMock = ({ user }) => {
                 className="fill-current text-[#ffcc00] stroke-[#ffcc00] stroke-[1px]"
               />
             </div>
-            <div className="text-xs text-[#949ba4]">Playing Minecraft</div>
+            <div className="text-xs text-[#949ba4]">Demo profile</div>
           </div>
         </motion.div>
 

@@ -1,4 +1,4 @@
-import { Headers, Request, Response } from "node-fetch";
+const { Headers, Request, Response } = globalThis;
 
 export function createRequest({
   url = "https://example.com",

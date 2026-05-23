@@ -5,6 +5,7 @@ import Header from "../components/layout/Header.jsx";
 import Footer from "../components/layout/Footer.jsx";
 import { beginDiscordLogin } from "../utils/discordAuth";
 import Seo from "../components/Seo";
+import { DEMO_SUPPORTERS, IS_DEMO_MODE } from "../constants/demo";
 
 const planStyles = {
   Yearly: {
@@ -78,8 +79,8 @@ const SupporterCard = ({ supporter, index }) => (
 const PAGE_SIZE = 9;
 
 const Supporters = () => {
-  const supportersTitle = "サポーター一覧";
-  const supportersDescription = "コミュニティを支えてくれているサポーターの一覧ページです。";
+  const supportersTitle = "支援者一覧デモ";
+  const supportersDescription = "支援者一覧画面の表示サンプルです。掲載名はモックデータです。";
   const [searchTerm, setSearchTerm] = useState("");
   const [supporters, setSupporters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,6 +98,23 @@ const Supporters = () => {
   useEffect(() => {
     let aborted = false;
     (async () => {
+      if (IS_DEMO_MODE) {
+        const mapped = DEMO_SUPPORTERS.map((s) => {
+          const style = planStyles[s.plan] || planStyles.Supporter;
+          return {
+            ...s,
+            ...style,
+            bg: style.bg,
+            color: style.color,
+            border: style.border,
+          };
+        });
+        setSupporters(mapped);
+        setCurrentPage(1);
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/supporters", {
           headers: { Accept: "application/json" },
@@ -195,13 +213,13 @@ const Supporters = () => {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-500 type-kicker mb-4"
             >
               <Star size={14} className="text-amber-400 fill-current" />
-              Community Heroes
+              Demo Supporters
             </motion.div>
-            <h1 className="font-display type-h1 token-text-display mb-4">Our Supporters</h1>
+            <h1 className="font-display type-h1 token-text-display mb-4">Supporter List Demo</h1>
             <p className="font-body type-body token-text-secondary max-w-xl mx-auto">
-              サーバーを支えてくれている素晴らしいメンバーたちです。
+              支援者一覧ページの表示サンプルです。
               <br className="hidden md:inline" />
-              彼らの支援によって、私たちは新しい冒険を作り続けることができます。
+              ここに表示されるユーザー名とプランはモックデータです。
             </p>
           </div>
 

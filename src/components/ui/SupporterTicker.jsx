@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { DEMO_SUPPORTERS, IS_DEMO_MODE } from "../../constants/demo";
 
 const SupporterTicker = ({ showLabel = true }) => {
   const [supporters, setSupporters] = useState([]);
@@ -21,6 +22,12 @@ const SupporterTicker = ({ showLabel = true }) => {
     let aborted = false;
 
     (async () => {
+      if (IS_DEMO_MODE) {
+        setSupporters(DEMO_SUPPORTERS);
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/supporters", {
           headers: { Accept: "application/json" },
@@ -75,7 +82,7 @@ const SupporterTicker = ({ showLabel = true }) => {
         <div className="container mx-auto px-4">
           <p className="text-center text-sm font-semibold text-slate-400 tracking-wider uppercase flex items-center justify-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-            最近加入したメンバー
+            デモ支援者
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
           </p>
         </div>
