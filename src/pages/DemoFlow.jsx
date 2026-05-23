@@ -8,7 +8,6 @@ import {
   CreditCard,
   ExternalLink,
   FileCheck2,
-  Flag,
   Globe2,
   HeartHandshake,
   Layers,
@@ -22,8 +21,6 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import SampleSiteNotice from "../components/ui/SampleSiteNotice";
 import Seo from "../components/Seo";
-import { joinImages } from "../data/lpImages";
-import { DEMO_SITE } from "../constants/demo";
 import lpEntryScreenshot from "../assets/images/demo-flow/lp-entry.jpg";
 import lpCtaScreenshot from "../assets/images/demo-flow/lp-cta.jpg";
 import membershipStartScreenshot from "../assets/images/demo-flow/membership-start.jpg";
@@ -292,11 +289,7 @@ const StickyTabs = ({ activeTabId, selectTab }) => (
   <div className="sticky top-16 z-30 md:top-20">
     <div className="border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
       <div className="container mx-auto px-4 md:px-6">
-        <div
-          role="tablist"
-          aria-label="本来フロー導線"
-          className="flex items-center gap-1 py-3"
-        >
+        <div role="tablist" aria-label="本来フロー導線" className="flex items-center gap-1 py-3">
           <span className="hidden items-center gap-2 pr-3 text-xs font-black uppercase tracking-[0.18em] text-slate-400 md:inline-flex">
             <Layers className="h-3.5 w-3.5" aria-hidden="true" />
             Flow
@@ -345,13 +338,8 @@ const FlowVisual = ({ image, label }) => (
 
 const ExternalFlowNote = ({ step, palette }) => (
   <div className="relative overflow-hidden rounded-[1.4rem] border border-dashed border-slate-300 bg-white p-7 shadow-sm md:p-9">
-    <div
-      className={`absolute inset-x-0 top-0 h-1 ${palette.bg}`}
-      aria-hidden="true"
-    />
-    <span className={`type-kicker ${palette.text}`}>
-      {step.externalLabel ?? "External Step"}
-    </span>
+    <div className={`absolute inset-x-0 top-0 h-1 ${palette.bg}`} aria-hidden="true" />
+    <span className={`type-kicker ${palette.text}`}>{step.externalLabel ?? "External Step"}</span>
     <h4 className="mt-3 font-display text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
       外部サービスで実行
     </h4>
@@ -585,110 +573,6 @@ const FinalCta = () => (
   </section>
 );
 
-const Hero = ({ activeTab, selectTab }) => {
-  const palette = accentClassMap[activeTab.accent];
-
-  return (
-    <section className="container mx-auto px-4 md:px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
-        className="relative overflow-hidden rounded-[1.5rem] bg-slate-900 shadow-2xl md:rounded-[2rem]"
-      >
-        <img
-          src={joinImages.heroMain.src}
-          srcSet={joinImages.heroMain.srcSet}
-          sizes="100vw"
-          width={joinImages.heroMain.width}
-          height={joinImages.heroMain.height}
-          loading="eager"
-          decoding="async"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-45"
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/55 via-slate-950/65 to-slate-950/85" />
-
-        <div className="relative z-10 px-6 py-16 md:px-12 md:py-24">
-          <div className="mx-auto max-w-4xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-slate-800 shadow-lg">
-              <Flag className="h-3.5 w-3.5 token-text-accent" aria-hidden="true" />
-              Portfolio Demo Guide
-            </span>
-            <h1 className="mt-6 font-display text-4xl font-black leading-[1.1] tracking-tight text-white md:text-6xl">
-              本来の導線を、
-              <br />
-              <span className="token-text-accent">入口ごとに案内する。</span>
-            </h1>
-            <p className="mt-5 max-w-2xl text-base font-semibold leading-relaxed text-slate-100 md:text-lg">
-              {DEMO_SITE.shortName}{" "}
-              は、一般流入向けLPと既存メンバー向けMembershipの2つの入口を持ちます。
-              本来の到達先を示し、公開版で再現できない外部処理は明示的に止めています。
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => selectTab(activeTab.id)}
-                className={`btn-push inline-flex items-center justify-center rounded-xl ${palette.bg} ${palette.hover} px-6 py-3.5 text-sm font-black text-white ${palette.shadow} transition active:translate-y-[4px] active:shadow-none`}
-              >
-                {activeTab.label}のフローへ
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  selectTab(activeTab.id === "lp" ? "membership" : "lp")
-                }
-                className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/20"
-              >
-                もう片方の入口を見る
-              </button>
-            </div>
-
-            <div className="mt-10 grid gap-3 sm:grid-cols-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const tabPalette = accentClassMap[tab.accent];
-                const isActive = tab.id === activeTab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => selectTab(tab.id)}
-                    className={`group flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
-                      isActive
-                        ? `${tabPalette.border} bg-white/15 backdrop-blur`
-                        : "border-white/15 bg-white/5 hover:bg-white/10"
-                    }`}
-                  >
-                    <span
-                      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tabPalette.bg} text-white`}
-                    >
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/70">
-                        {tab.eyebrow}
-                      </div>
-                      <div className="truncate text-sm font-black text-white">
-                        {tab.label}
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-black text-white">
-                      {tab.steps.length} steps
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </section>
-  );
-};
-
 const DemoFlow = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTabId = getActiveTab(searchParams);
@@ -734,12 +618,6 @@ const DemoFlow = () => {
       <Header onScrollTop={scrollToTop} rightSlot={rightSlot} />
 
       <main className="pt-20 md:pt-24">
-        <div className="pb-10 md:pb-16">
-          <Hero activeTab={activeTab} selectTab={selectTab} />
-        </div>
-
-        <SampleSiteNotice />
-
         <div ref={sectionRef} aria-hidden="true" />
         <StickyTabs activeTabId={activeTabId} selectTab={selectTab} />
         <FlowShowcase activeTab={activeTab} selectTab={selectTab} />
@@ -747,6 +625,8 @@ const DemoFlow = () => {
         <BoundarySection />
 
         <FinalCta />
+
+        <SampleSiteNotice />
       </main>
       <Footer />
     </div>
